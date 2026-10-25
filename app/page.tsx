@@ -15,6 +15,7 @@ import Link from "next/link";
 import { GitHubIcon } from "@/components/icons";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
+import { ProjectJsonLd } from "@/components/seo/ProjectJsonLd";
 import { FeatureCard } from "@/components/ui/FeatureCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { StatCard } from "@/components/ui/StatCard";
@@ -100,6 +101,7 @@ const engineering = stats.filter((stat) =>
 export default function HomePage() {
   return (
     <>
+      <ProjectJsonLd />
       <section className="relative overflow-hidden bg-navy text-navy-fg">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.07]"
