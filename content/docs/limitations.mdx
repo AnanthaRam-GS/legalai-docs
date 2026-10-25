@@ -1,0 +1,40 @@
+<Callout kind="disclaimer" title="Not legal advice">
+  LegalAI is a research prototype built for an academic project. It does not provide legal advice,
+  and its output must not be relied on as a substitute for a qualified lawyer. Always check an
+  answer against the cited judgment and the current statute, and consult a lawyer before acting on
+  it.
+</Callout>
+
+## Coverage
+
+- **A small corpus.** Answers draw on 70 reviewed judgments. Many questions will fall outside it; LegalAI is designed to say so rather than answer from general knowledge, but a "no coverage" answer means only that the corpus lacks material, not that no law applies.
+- **Criminal law only,** in English, centred on the IPC, BNS, CrPC and BNSS and a few special Acts cited in judgments.
+- **The IPC to BNS transition** is thinly covered: BNS and BNSS account for 33 of the 920 section citations extracted from the corpus, and only 3 of the 30 benchmark queries test the transition.
+
+## Answers
+
+- **Grounding is checked structurally.** Citation validation confirms that each claim cites evidence that was actually retrieved, with matching metadata. It does not prove that the cited passage supports the claim in a legal sense.
+- **Relative relevance is not a probability.** It ranks precedents within one answer; a score of 1.0 means "best of these five", not "certainly relevant".
+- **Predicted sections are signals,** used to guide retrieval, not legal conclusions.
+- **OCR can misread scans.** Low-confidence pages are flagged, but names, dates and figures from scans should be checked against the original.
+- **Professional answers are not available live** on the current provider tier: the professional answer does not fit the provider's output limits. This is a capacity limit, not a design choice, and it is being worked on.
+
+## Analytics
+
+- Cited sections and outcomes are extracted by rules and are **unreviewed** until a qualified reviewer checks them. Outcome fields are empty when the rules find nothing or find conflicting values.
+- The IPC-to-BNS mapping is a comparative reference, not statutory text, and is **unreviewed**; seven pairs printed by NCRB are missing from it.
+- NCRB figures are 2024 registrations. They do not describe convictions, acquittals or trends across years.
+
+## Evaluation
+
+- Retrieval quality was measured on **30 queries** labelled by **one reviewer**, using pooled rather than exhaustive relevance, over the same small corpus. The figures are historical and descriptive, not statistically significant.
+- Citation validity under the current prompt rests on a **handful of live runs** (5 of 5 citations valid).
+- There has been **no user acceptance testing** yet.
+
+## Engineering
+
+- Rate limits and the generation cap live in memory, so they reset on restart and do not span several server processes.
+- Logout does not revoke a copied token before it expires (60 minutes).
+- The system has not yet been deployed.
+
+Source: `docs/RETRIEVAL_EVALUATION_RESULTS.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/OCR.md`, `docs/SECURITY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository.

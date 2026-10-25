@@ -31,6 +31,11 @@ export const docs: DocMeta[] = [
     title: "Testing and QA",
     description: "Test suites, the isolated test database and data-change safeguards.",
   },
+  {
+    slug: "limitations",
+    title: "Limitations and legal disclaimer",
+    description: "What LegalAI cannot do, and how its output should be read.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {
