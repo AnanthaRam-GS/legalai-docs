@@ -8,6 +8,8 @@ import { inter, sourceSerif } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.siteUrl),
+  alternates: { canonical: "/" },
   title: { default: `${site.name}: Project documentation`, template: `%s | ${site.name}` },
   description: site.description,
   applicationName: site.name,
@@ -17,6 +19,7 @@ export const metadata: Metadata = {
     title: site.title,
     description: site.description,
     locale: "en_IN",
+    url: "/",
   },
   twitter: { card: "summary", title: site.title, description: site.description },
 };

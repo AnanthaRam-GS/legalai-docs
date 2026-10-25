@@ -6,6 +6,7 @@ import { docs } from "@/content/docs";
 export const metadata: Metadata = {
   title: "Documentation",
   description: "Setup, API reference, data sources, security, testing, limitations and glossary.",
+  alternates: { canonical: "/docs/" },
 };
 
 export default function DocsIndexPage() {

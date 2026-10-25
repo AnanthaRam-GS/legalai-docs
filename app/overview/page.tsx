@@ -21,6 +21,7 @@ export const metadata: Metadata = {
   title: "Problem and objectives",
   description:
     "The problem LegalAI addresses, its objectives, scope, non-goals and intended users.",
+  alternates: { canonical: "/overview/" },
 };
 
 const motivations = [

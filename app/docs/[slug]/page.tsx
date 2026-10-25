@@ -18,7 +18,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
   const doc = getDoc((await params).slug);
-  return doc ? { title: doc.title, description: doc.description } : {};
+  return doc
+    ? {
+        title: doc.title,
+        description: doc.description,
+        alternates: { canonical: `/docs/${doc.slug}/` },
+      }
+    : {};
 }
 
 export default async function DocPage({ params }: DocPageProps) {

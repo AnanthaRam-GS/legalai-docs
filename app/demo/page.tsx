@@ -11,6 +11,7 @@ import { site } from "@/content/site";
 export const metadata: Metadata = {
   title: "Demo",
   description: "A video walkthrough and screenshots of LegalAI.",
+  alternates: { canonical: "/demo/" },
 };
 
 const gallery = [

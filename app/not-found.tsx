@@ -6,6 +6,8 @@ import { mainNav } from "@/lib/nav";
 
 export const metadata: Metadata = {
   title: "Page not found",
+  robots: { index: false, follow: true },
+  alternates: { canonical: null },
 };
 
 export default function NotFound() {

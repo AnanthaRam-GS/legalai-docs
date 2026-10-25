@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Architecture",
   description:
     "LegalAI's four layers, the retrieval-augmented query pipeline, all-or-nothing ingestion and the data model.",
+  alternates: { canonical: "/architecture/" },
 };
 
 export default function ArchitecturePage() {

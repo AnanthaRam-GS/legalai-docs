@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   title: "Features",
   description:
     "Public Mode, Professional Mode, analytics dashboards, admin ingestion, OCR for scanned PDFs, and privacy for uploads.",
+  alternates: { canonical: "/features/" },
 };
 
 interface FeatureSectionProps {

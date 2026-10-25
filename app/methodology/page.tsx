@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Methodology",
   description:
     "How LegalAI acquires data, chunks judgments, retrieves and reranks evidence, generates grounded answers, builds analytics data, runs OCR and evaluates itself.",
+  alternates: { canonical: "/methodology/" },
 };
 
 const sections = [

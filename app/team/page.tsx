@@ -9,6 +9,7 @@ import { guide, site, team } from "@/content/site";
 export const metadata: Metadata = {
   title: "Team",
   description: "The project guide and the four developers of LegalAI.",
+  alternates: { canonical: "/team/" },
 };
 
 export default function TeamPage() {

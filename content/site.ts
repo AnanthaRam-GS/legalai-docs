@@ -77,6 +77,8 @@ export const site = {
   department: "Department of Computer Science and Engineering",
   school: "School of Computing",
   institution: "Amrita Vishwa Vidyapeetham",
+  /** Public URL of this site, used for canonical links, the sitemap and share cards. */
+  siteUrl: "https://legalai-docs.vercel.app",
   repoUrl: "https://github.com/AnanthaRam-GS/lexintelAI",
   docsRepoUrl: "https://github.com/AnanthaRam-GS/legalai-docs",
   /** YouTube or Google Drive link. Leave empty to show the "coming soon" state. */

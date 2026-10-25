@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Progress",
   description:
     "LegalAI's build-plan phases and their status, the Phase 1 review checklist, the engineering log and the remaining roadmap.",
+  alternates: { canonical: "/progress/" },
 };
 
 function ItemList({ items }: { items: PhaseItem[] }) {

@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Results",
   description:
     "Retrieval quality, reranker latency, OCR accuracy, citation validity, NCRB validation and store reconciliation, each with its sample size, date and source.",
+  alternates: { canonical: "/results/" },
 };
 
 const toc = [

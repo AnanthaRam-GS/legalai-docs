@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: "Tech stack",
   description:
     "LegalAI's technology by layer, and where the implementation deviates from the build plan and why.",
+  alternates: { canonical: "/tech-stack/" },
 };
 
 interface Tech {
