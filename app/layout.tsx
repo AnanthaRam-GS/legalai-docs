@@ -10,6 +10,15 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: { default: `${site.name}: Project documentation`, template: `%s | ${site.name}` },
   description: site.description,
+  applicationName: site.name,
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title: site.title,
+    description: site.description,
+    locale: "en_IN",
+  },
+  twitter: { card: "summary", title: site.title, description: site.description },
 };
 
 export const viewport: Viewport = {
