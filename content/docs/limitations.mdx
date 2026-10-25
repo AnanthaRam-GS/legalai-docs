@@ -35,6 +35,7 @@
 
 - Rate limits and the generation cap live in memory, so they reset on restart and do not span several server processes.
 - Logout does not revoke a copied token before it expires (60 minutes).
+- Model inference on Apple MPS is not serialised: in end-to-end testing, start-up warm-up overlapping the first request crashed the backend, so that test mode runs with warm-up off until it is fixed.
 - The system has not yet been deployed.
 
 Source: `docs/RETRIEVAL_EVALUATION_RESULTS.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/OCR.md`, `docs/SECURITY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository.

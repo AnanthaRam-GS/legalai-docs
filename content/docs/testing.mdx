@@ -1,13 +1,33 @@
-LegalAI is tested at three levels: fast unit and contract tests, database-backed integration tests on an isolated database, and supervised live runs against real models. Data changes have their own safeguards.
+LegalAI is tested at four levels: fast unit and contract tests, database-backed integration tests on an isolated database, end-to-end browser journeys, and supervised live runs against real models. Continuous integration runs the first three on every pull request. Data changes have their own safeguards.
 
 ## Test suites at a glance
 
-| Suite          | Runner                     | Size on `main` (24 October 2026) |
-| -------------- | -------------------------- | -------------------------------- |
-| Backend tests  | Python `unittest`          | 938 test methods in 80 modules   |
-| Frontend tests | Vitest and Testing Library | 291 test cases in 40 files       |
+| Suite               | Runner                     | Size on `main` (25 October 2026)                           |
+| ------------------- | -------------------------- | ---------------------------------------------------------- |
+| Backend tests       | Python `unittest`          | 951 test methods in 81 modules, 12 of them database-backed |
+| Frontend tests      | Vitest and Testing Library | 291 test cases in 40 files                                 |
+| End-to-end journeys | Playwright (Chromium)      | 15 tests in 6 spec files                                   |
 
-These are counts of tests defined in the code at commit `28b23d9`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+These are counts of tests defined in the code at commit `ed3cc76`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+
+## Continuous integration
+
+GitHub Actions runs four jobs on every pull request and every push to `main`. No job uses a secret, calls an LLM provider, downloads a model or reads the real corpus.
+
+| Job            | What it runs                                                                           |
+| -------------- | -------------------------------------------------------------------------------------- |
+| `backend-unit` | The non-database suites, with Tesseract installed; fails if the OCR tests were skipped |
+| `backend-db`   | The 12 database-backed modules against a throwaway PostgreSQL service                  |
+| `frontend`     | ESLint, Prettier, the TypeScript check, Vitest and a production build                  |
+| `e2e`          | The Playwright journeys against the real backend and frontend in fake mode             |
+
+Five tests need the real corpus or model cache, which a clean checkout does not have; they are skipped in CI with a stated reason and run locally.
+
+## End-to-end journeys
+
+The journeys cover public questions (text, out of scope and an FIR upload), registration with an email code, the lawyer workspace (precedents, an FIR brief, history and the five analytics tabs), admin store health with an ingestion and a duplicate upload, access control, and a 375 px layout.
+
+In CI they run in a **test-only fake mode**: a deterministic answer model that cites the retrieved evidence, a hashing embedder and an overlap reranker over six invented judgments. The backend refuses this mode outside the test environment. A local real mode runs the same journeys with the real retrieval models against a restored copy of the development data. The screenshots on this site come from the real application, never from fake mode.
 
 ## Isolated test database
 
@@ -43,7 +63,6 @@ Live runs send real questions through the full pipeline with a live answer model
 
 ## Not yet in place
 
-- **Continuous integration** for both suites on every pull request <StatusBadge status="in-progress" />
 - **User acceptance testing** with law students or practitioners and with non-technical users <StatusBadge status="planned" />
 - **Live professional runs**, blocked by provider capacity <StatusBadge status="blocked" />
 

@@ -2,7 +2,7 @@
 
 Every number and factual claim on the LegalAI documentation site maps to a file in the
 [LegalAI repository](https://github.com/AnanthaRam-GS/lexintelAI). Paths are relative to that
-repository and describe `main` at commit **`28b23d9`** (merge of PR #66, 24 October 2026) unless a
+repository and describe `main` at commit **`ed3cc76`** (merge of PR #67, 25 October 2026) unless a
 row says otherwise.
 
 "Build plan" means the team's internal _Developer Implementation Plan_ (version 1.1, last updated
@@ -13,31 +13,34 @@ When you change a number in `content/site.ts`, a page or an MDX file, update its
 
 ## Project facts
 
-| Claim                                                                                  | Source                                                                                                                                                              |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Title, course 23CSE399, department, school, institution                                | Build plan, title page                                                                                                                                              |
-| Guide: Dr. Sabarish B A, Assistant Professor, Dept. of CSE                             | Build plan, title page                                                                                                                                              |
-| Team names, registration numbers and roles                                             | Build plan, title page                                                                                                                                              |
-| Team responsibilities                                                                  | Build plan, sections 6–7 (work packages 0.1–0.6, 1.A.x, 1.R.x, 2.V.x, 3.G.x, 4.x)                                                                                   |
-| Phases 0–4, Phase 1 review checklist ("60% completion target")                         | Build plan, sections 6–7                                                                                                                                            |
-| UAT target: 2–3 law students or practitioners, 3–5 non-technical users                 | Build plan, task 4.ALL                                                                                                                                              |
-| Evaluation target of about 100 queries; LLM-only / semantic / full-pipeline comparison | Build plan, task 4.A.1                                                                                                                                              |
-| CourtSim deferred to future work                                                       | Build plan, section 9                                                                                                                                               |
-| 66 merged pull requests; milestone dates and PR numbers                                | `git log main --merges`                                                                                                                                             |
-| CI workflow not yet merged ("In progress")                                             | Not present on `main`; work exists only as an unmerged branch                                                                                                       |
-| InLegalBERT / LlamaIndex scope change awaiting the guide's approval                    | Status supplied by the project owner; the deviations themselves are in `docs/LEGAL_NER_SELECTION_DECISION.md` and the absence of LlamaIndex from `requirements.txt` |
+| Claim                                                                                                       | Source                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Title, course 23CSE399, department, school, institution                                                     | Build plan, title page                                                                                                                                              |
+| Guide: Dr. Sabarish B A, Assistant Professor, Dept. of CSE                                                  | Build plan, title page                                                                                                                                              |
+| Team names, registration numbers and roles                                                                  | Build plan, title page                                                                                                                                              |
+| Team responsibilities                                                                                       | Build plan, sections 6–7 (work packages 0.1–0.6, 1.A.x, 1.R.x, 2.V.x, 3.G.x, 4.x)                                                                                   |
+| Phases 0–4, Phase 1 review checklist ("60% completion target")                                              | Build plan, sections 6–7                                                                                                                                            |
+| UAT target: 2–3 law students or practitioners, 3–5 non-technical users                                      | Build plan, task 4.ALL                                                                                                                                              |
+| Evaluation target of about 100 queries; LLM-only / semantic / full-pipeline comparison                      | Build plan, task 4.A.1                                                                                                                                              |
+| CourtSim deferred to future work                                                                            | Build plan, section 9                                                                                                                                               |
+| 67 merged pull requests; milestone dates and PR numbers                                                     | `git log main --merges`                                                                                                                                             |
+| CI: four jobs (`backend-unit`, `backend-db`, `frontend`, `e2e`), no secrets, on every PR and push to `main` | `.github/workflows/ci.yml`; `docs/TESTING.md`, Continuous integration; PR #67                                                                                       |
+| InLegalBERT / LlamaIndex scope change awaiting the guide's approval                                         | Status supplied by the project owner; the deviations themselves are in `docs/LEGAL_NER_SELECTION_DECISION.md` and the absence of LlamaIndex from `requirements.txt` |
 
 ## Home page stats (`content/site.ts` → `stats`)
 
-| Claim                                                                                                | Source                                                                                                                                                                 |
-| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 70 trusted judgments, 1,356 chunks, consistent across PostgreSQL, Chroma and BM25 (as of 2026-10-19) | `docs/INDEX_METADATA.md` (Dev results 2026-10-19); `docs/reconciliation/INVENTORY_REPORT.md`                                                                           |
-| P@5 0.873, MRR@5 0.961, nDCG@5 0.819 (Hybrid+Rerank, broad)                                          | `docs/RETRIEVAL_EVALUATION_RESULTS.md`, Overall Metrics                                                                                                                |
-| 30 queries, 695 human relevance judgments, corpus 70 / 1,356                                         | `docs/RETRIEVAL_EVALUATION_RESULTS.md`, Benchmark Snapshot                                                                                                             |
-| Retrieval results dated 2026-09-07                                                                   | `git log` first commit of `docs/RETRIEVAL_EVALUATION_RESULTS.md`                                                                                                       |
-| 938 backend test methods in 80 modules                                                               | `git grep -E '^[[:space:]]+def test_' main -- 'backend/scripts/tests/*.py'`; `git ls-tree` count of `backend/scripts/tests/test_*.py` (static count, not a pass count) |
-| 291 frontend test cases in 40 files                                                                  | `git grep -E '^[[:space:]]*(it                                                                                                                                         | test)(\.each\(...\))?\('`over`frontend/**/_.test.ts(x)`on`main`; 40 `_.test.ts(x)` files |
-| Reranker speed-up 4.2× at p50, MPS fp16 vs CPU fp32, 10 queries × 3 passes                           | `docs/performance/PERFORMANCE_BASELINE.md`, Latency                                                                                                                    |
+| Claim                                                                                                | Source                                                                                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 70 trusted judgments, 1,356 chunks, consistent across PostgreSQL, Chroma and BM25 (as of 2026-10-19) | `docs/INDEX_METADATA.md` (Dev results 2026-10-19); `docs/reconciliation/INVENTORY_REPORT.md`                                                                                                                       |
+| P@5 0.873, MRR@5 0.961, nDCG@5 0.819 (Hybrid+Rerank, broad)                                          | `docs/RETRIEVAL_EVALUATION_RESULTS.md`, Overall Metrics                                                                                                                                                            |
+| 30 queries, 695 human relevance judgments, corpus 70 / 1,356                                         | `docs/RETRIEVAL_EVALUATION_RESULTS.md`, Benchmark Snapshot                                                                                                                                                         |
+| Retrieval results dated 2026-09-07                                                                   | `git log` first commit of `docs/RETRIEVAL_EVALUATION_RESULTS.md`                                                                                                                                                   |
+| 951 backend test methods in 81 modules (12 database-backed)                                          | `git grep -E '^[[:space:]]+def test_' main -- 'backend/scripts/tests/*.py'`; `git ls-tree` count of `backend/scripts/tests/test_*.py`; `backend/scripts/dev/db_test_modules.txt` (static counts, not a pass count) |
+| 291 frontend test cases in 40 files                                                                  | `git grep -E` for `it(`, `test(` and `test.each(...)(` calls over `frontend/**/*.test.ts(x)` on `main`; 40 `*.test.ts(x)` files                                                                                    |
+| 15 Playwright end-to-end tests in 6 spec files; journeys covered; fake mode is test-only             | `frontend/e2e/*.spec.ts` on `main`; `docs/TESTING.md`, End-to-end browser tests                                                                                                                                    |
+| 5 local-only tests skipped in CI                                                                     | `docs/TESTING.md`, Local-only tests                                                                                                                                                                                |
+| MPS warm-up overlapping the first request crashed the backend; inference not serialised              | `docs/TESTING.md`, Local real mode                                                                                                                                                                                 |
+| Reranker speed-up 4.2× at p50, MPS fp16 vs CPU fp32, 10 queries × 3 passes                           | `docs/performance/PERFORMANCE_BASELINE.md`, Latency                                                                                                                                                                |
 
 ## Overview
 
@@ -152,5 +155,30 @@ When you change a number in `content/site.ts`, a page or an MDX file, update its
 - The brief described the retrieval benchmark as "30 queries, 695 judgments". The 695 are human
   **relevance judgments**; the corpus at the time was 70 judgments (1,356 chunks). The site uses
   the precise wording.
-- `docs/TESTING.md` lists 55 + 10 test modules; `main` now has 80 `test_*.py` modules. The site uses
-  the count from the code.
+- At `28b23d9`, `docs/TESTING.md` listed 55 + 10 test modules while the code had 80; it now names 12
+  database-backed modules and no total. The site uses the count from the code.
+
+## Screenshots
+
+| Claim                                                                      | Source                                                                                                                                             |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| All images in `public/screenshots/`                                        | Captured on 25 October 2026 with `scripts/capture-screenshots.ts` from LegalAI `main` (`ed3cc76`) running locally against the development database |
+| Live public answer about IPC 304B with 3 validated sources                 | One live `/query/public` call (HTTP 200); 2 live LLM calls were used in total for the screenshots                                                  |
+| Admin status: 70 documents, 1,356 vectors, records and chunks, all healthy | `admin-status.webp`, matching `docs/reconciliation/INVENTORY_REPORT.md`                                                                            |
+
+## Fact-check log (25 October 2026, `28b23d9` → `ed3cc76`)
+
+Only `docs/TESTING.md` and test, CI and e2e files changed between the two commits; routes, models,
+dependencies and every other source document are unchanged, so all other rows were re-confirmed as is.
+
+| Claim                                                              | Old                    | New                                                                                               |
+| ------------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------- |
+| Commit the site describes                                          | `28b23d9` (PR #66)     | `ed3cc76` (PR #67)                                                                                |
+| Backend test methods / modules                                     | 938 / 80               | 951 / 81                                                                                          |
+| Frontend test cases / files                                        | 291 / 40               | 291 / 40 (unchanged; date updated)                                                                |
+| End-to-end tests                                                   | not present            | 15 Playwright tests in 6 specs                                                                    |
+| Continuous integration                                             | In progress (unmerged) | Completed: 4 GitHub Actions jobs                                                                  |
+| Merged pull requests                                               | 66                     | 67                                                                                                |
+| Phase 4 "Continuous integration" item, milestone and roadmap entry | In progress            | Completed; removed from the roadmap                                                               |
+| Known issue                                                        | —                      | MPS inference not serialised (new roadmap item and limitation)                                    |
+| FE-001                                                             | not mentioned          | A test-only timer-count issue fixed in PR #66 (jsdom storage events); no site claim depends on it |
