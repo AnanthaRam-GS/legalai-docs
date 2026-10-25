@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <Container className="py-24 sm:py-32">
-      <div className="mx-auto max-w-xl text-center">
+      <div className="mx-auto max-w-xl text-center" data-pagefind-ignore="all">
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-accent-soft text-accent">
           <Compass className="h-7 w-7" aria-hidden="true" />
         </span>

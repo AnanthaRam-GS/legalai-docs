@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             Skip to content
           </a>
           <Navbar />
-          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
+          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none" data-pagefind-body>
             {children}
           </main>
           <Footer />
