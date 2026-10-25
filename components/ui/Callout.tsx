@@ -1,22 +1,16 @@
-import { Info, Scale, TriangleAlert } from "lucide-react";
+import { Info, TriangleAlert } from "lucide-react";
 import type { ReactNode } from "react";
 
-type CalloutKind = "info" | "warning" | "disclaimer";
+type CalloutKind = "info" | "warning";
 
 const KINDS: Record<CalloutKind, { label: string; className: string; Icon: typeof Info }> = {
   info: { label: "Note", className: "border-info/40 bg-info-bg", Icon: Info },
   warning: { label: "Caveat", className: "border-warn/40 bg-warn-bg", Icon: TriangleAlert },
-  disclaimer: {
-    label: "Disclaimer",
-    className: "border-pending/40 bg-pending-bg",
-    Icon: Scale,
-  },
 };
 
 const ICON_COLOUR: Record<CalloutKind, string> = {
   info: "text-info",
   warning: "text-warn",
-  disclaimer: "text-pending",
 };
 
 interface CalloutProps {
