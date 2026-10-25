@@ -1,0 +1,53 @@
+LegalAI uses three kinds of data: court judgments for retrieval, official crime statistics for analytics, and a comparative IPC-to-BNS mapping. Each keeps its provenance.
+
+## Judgments
+
+|                     |                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Source**          | Indian Kanoon, through its documented API (no website scraping)                                        |
+| **Corpus**          | 70 trusted, human-reviewed criminal judgments: 48 High Court, 14 Supreme Court, 8 district or sessions |
+| **Size**            | 4,195 paragraphs in 1,356 chunks                                                                       |
+| **Provenance kept** | Source URL, source document ID, retrieval time, SHA-256 digest                                         |
+| **Attribution**     | Judgment data sourced from the Indian Kanoon API                                                       |
+
+Candidates were filtered for criminal law, pre-screened and reviewed by a person before acceptance. A separate validation set covers judgments after 1 July 2024 to exercise BNS and BNSS handling. The corpus is intentionally small for now; the plan scales it in stages only after metadata quality and retrieval behaviour are validated.
+
+<Callout kind="info" title="Attribution">
+  The Indian Kanoon API terms require attribution where API-provided information is displayed or
+  used as RAG context. LegalAI credits the source in its product and on this site.
+</Callout>
+
+## NCRB crime statistics
+
+|                   |                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Publication**   | _Crime in India 2024_, Volume I, National Crime Records Bureau, Ministry of Home Affairs, Government of India |
+| **Table**         | Table 1A.4, IPC/BNS Crimes (Crime Head-wise and State/UT-wise), 79 table pages                                |
+| **Obtained from** | The official NCRB publication page; no mirror or third-party copy was used                                    |
+| **Integrity**     | The extractor refuses any file but the recorded one, checked by SHA-256                                       |
+| **Rows**          | 6,201: 159 crime heads × 39 State/UT and total rows                                                           |
+
+2024 is the first edition reported under the BNS, and the table prints the BNS head beside the IPC head, so both are stored. Counts are registrations, not convictions or acquittals. Crime heads keep their printed names; only one evident misprint has a display label, and two printed section notations are parsed in corrected form, each with documented evidence.
+
+## IPC-to-BNS mapping
+
+|              |                                                                                   |
+| ------------ | --------------------------------------------------------------------------------- |
+| **Sources**  | NCRB CYTRAIN section correspondence table and CYTRAIN BNS text                    |
+| **Accessed** | 4 September 2026                                                                  |
+| **Rows**     | 370 (367 direct, 3 repealed)                                                      |
+| **Status**   | <StatusBadge status="pending-approval" label="Unreviewed" /> pending legal review |
+
+The mapping is a comparative reference, not statutory text. A cross-check against the pairs printed in the corrected NCRB table found 22 matches, 7 missing pairs and no contradictions. Regeneration is waiting on the CYTRAIN site, which was unreachable when last tried.
+
+## Derived data
+
+- **Cited sections** for each judgment are extracted by deterministic rules, with the chunk that supports each one.
+- **Outcomes** (conviction status, appeal result, disposition) are extracted by conservative rules from the operative part of each judgment. They are unreviewed until a qualified reviewer imports a review file.
+
+## What is never collected
+
+- User uploads are not added to the corpus or any index.
+- No API credentials, secrets or user data are stored in the repository.
+
+Sources: `docs/DATA_SOURCES.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/JUDGMENT_DOCUMENT_PROCESSING.md`, `docs/TRANSITION_VALIDATION_SET.md`, `data/raw/ncrb/SOURCES.md` and `data/raw/ipc_bns/SOURCES.md` in the LegalAI repository.

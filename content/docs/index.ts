@@ -16,6 +16,11 @@ export const docs: DocMeta[] = [
     title: "API reference",
     description: "Endpoints by group and role, and the error-code catalogue.",
   },
+  {
+    slug: "data-sources",
+    title: "Data sources and attribution",
+    description: "Where the judgments, statistics and mappings come from.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {

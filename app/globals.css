@@ -340,3 +340,8 @@
 .prose-doc hr {
   border-color: var(--color-border);
 }
+
+/* Key-value tables in MDX have an empty header row; hide it. */
+.prose-doc thead:not(:has(th:not(:empty))) {
+  display: none;
+}
