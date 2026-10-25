@@ -10,8 +10,8 @@ export function Footer() {
   return (
     <footer className="mt-24 border-t border-border bg-surface">
       <Container className="py-12">
-        <div className="grid gap-10 md:grid-cols-12">
-          <div className="md:col-span-5">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="sm:col-span-2 lg:col-span-5">
             <p className="font-serif text-xl font-bold">{site.name}</p>
             <p className="mt-2 text-sm text-muted">
               {site.course}
@@ -30,9 +30,9 @@ export function Footer() {
             </a>
           </div>
 
-          <nav aria-label="Footer" className="md:col-span-3">
+          <nav aria-label="Footer" className="lg:col-span-3">
             <p className="text-sm font-semibold">Pages</p>
-            <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               {mainNav.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="text-muted hover:text-fg">
@@ -43,7 +43,7 @@ export function Footer() {
             </ul>
           </nav>
 
-          <div className="md:col-span-4">
+          <div className="lg:col-span-4">
             <p className="text-sm font-semibold">Acknowledgements</p>
             <ul className="mt-3 space-y-2 text-sm text-muted">
               <li>
