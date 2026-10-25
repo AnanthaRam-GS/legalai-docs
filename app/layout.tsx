@@ -26,6 +26,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${inter.variable} ${sourceSerif.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        {/* Marks the document as scripted so scroll reveals may start hidden. */}
+        <script
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <ThemeProvider>
           <a href="#main" className="skip-link">

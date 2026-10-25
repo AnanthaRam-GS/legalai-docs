@@ -225,3 +225,19 @@
 .skip-link:focus {
   top: 1rem;
 }
+
+/* Scroll reveal (see components/motion/Reveal.tsx). */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 500ms ease-out,
+      transform 500ms ease-out;
+  }
+
+  .js [data-reveal][data-shown] {
+    opacity: 1;
+    transform: none;
+  }
+}
