@@ -145,6 +145,7 @@ When you change a number in `content/site.ts`, a page or an MDX file, update its
 | JWT expiry 60 minutes                                                                                                 | `docs/SECURITY.md`, Residual risks                                                                                     |
 | Bootstrap guarantees; snapshot, backup, rehearsal procedure                                                           | `docs/TESTING.md`                                                                                                      |
 | OCR fixture threshold ≥ 95%                                                                                           | `docs/OCR.md`                                                                                                          |
+| OCR reads English by default; other languages need extra language data                                                | `docs/OCR.md`, System dependency and Limits (`OCR_LANGUAGE` default `eng`)                                             |
 | BNS/BNSS 33 of 920 section citations                                                                                  | `docs/ANALYTICS_DATA.md`, Section producer (By statute)                                                                |
 | 3 transition queries in the benchmark                                                                                 | `docs/RETRIEVAL_EVALUATION_RESULTS.md`, transition_regime                                                              |
 
@@ -182,3 +183,19 @@ dependencies and every other source document are unchanged, so all other rows we
 | Phase 4 "Continuous integration" item, milestone and roadmap entry | In progress            | Completed; removed from the roadmap                                                               |
 | Known issue                                                        | —                      | MPS inference not serialised (new roadmap item and limitation)                                    |
 | FE-001                                                             | not mentioned          | A test-only timer-count issue fixed in PR #66 (jsdom storage events); no site claim depends on it |
+
+## Removed claims (25 October 2026)
+
+At the project owner's request, the legal disclaimer was removed from the site. These statements
+no longer appear anywhere, so they need no source:
+
+| Removed statement                                                                                                                                                               | Where it was                                          |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| "LegalAI is a research prototype built for an academic project. It does not provide legal advice, and its output must not be relied on as a substitute for a qualified lawyer." | `site.disclaimer`: footer, Overview and Demo callouts |
+| "Research prototype. Not legal advice."                                                                                                                                         | Home page hero                                        |
+| "…check an answer against the cited judgment and the current statute, and consult a lawyer before acting on it."                                                                | Limitations doc callout                               |
+| "Legal definitions … are not legal advice."                                                                                                                                     | Glossary intro                                        |
+| "Giving legal advice" as a non-goal                                                                                                                                             | Overview, Scope and non-goals                         |
+| "LegalAI is a research prototype. It does not provide legal advice."                                                                                                            | `README.md`                                           |
+
+The docs page "Limitations and legal disclaimer" is now "Limitations"; its URL is unchanged.

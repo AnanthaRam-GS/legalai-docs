@@ -8,8 +8,6 @@ The site explains the problem, features, architecture, methodology, results and 
 LegalAI, and hosts summary documentation. The application itself lives in
 [AnanthaRam-GS/lexintelAI](https://github.com/AnanthaRam-GS/lexintelAI).
 
-> LegalAI is a research prototype. It does not provide legal advice.
-
 Live site: **https://legalai-docs.vercel.app/**
 
 ## Stack
@@ -54,7 +52,7 @@ Typed configuration that the pages read from:
 
 | Field                                                | What it controls                                                                                                  |
 | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `site`                                               | Title, tagline, course and institution, `siteUrl`, `repoUrl`, the disclaimer                                      |
+| `site`                                               | Title, tagline, course and institution, `siteUrl`, `repoUrl`                                                      |
 | `site.demoVideoUrl`                                  | YouTube or Google Drive link for the Demo page. Leave `""` to show "coming soon"                                  |
 | `site.lastUpdated`                                   | ISO date shown in the footer and on doc pages                                                                     |
 | `site.sourceCommit`                                  | The LegalAI commit the facts describe                                                                             |
@@ -77,7 +75,7 @@ placeholder. See [Capturing screenshots](#capturing-screenshots) to refresh them
    sidebar, static generation and previous/next links.
 3. Use `##` and `###` headings; they get anchor ids and appear in the "On this page" list.
 
-MDX pages can use `<Callout kind="info|warning|disclaimer" title="…">` and
+MDX pages can use `<Callout kind="info|warning" title="…">` and
 `<StatusBadge status="…" />` without importing them. Leave a blank line after an opening JSX tag
 and before its closing tag when the content is Markdown (lists, links), or Prettier will merge it
 into one paragraph.
