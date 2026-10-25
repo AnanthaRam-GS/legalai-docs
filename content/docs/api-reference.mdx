@@ -1,0 +1,180 @@
+The backend is a single FastAPI application. All requests and responses are JSON, except PDF uploads, which use `multipart/form-data`. Sessions use an HttpOnly cookie, so browser clients send requests with credentials included.
+
+**Roles:** _Anyone_ needs no account. _Signed in_ means any authenticated user. _Lawyer_ covers the `lawyer` and `admin` roles. _Admin_ is `admin` only. The role is always read from the database, never from the client.
+
+## Health
+
+| Method | Path      | Role   | Purpose                                                                                     |
+| ------ | --------- | ------ | ------------------------------------------------------------------------------------------- |
+| GET    | `/health` | Anyone | Database status, plus model warm-up (`models.status`, devices) and OCR availability (`ocr`) |
+
+## Authentication
+
+| Method | Path                        | Role      | Purpose                                              |
+| ------ | --------------------------- | --------- | ---------------------------------------------------- |
+| POST   | `/auth/register`            | Anyone    | Create a `public` account and email a six-digit code |
+| POST   | `/auth/verify-email`        | Anyone    | Verify the email with the code                       |
+| POST   | `/auth/resend-verification` | Anyone    | Send a new code (same answer for every email)        |
+| POST   | `/auth/login`               | Anyone    | Email and password; sets the session cookie          |
+| POST   | `/auth/logout`              | Anyone    | Clears the session cookie                            |
+| GET    | `/auth/me`                  | Signed in | The current user and role                            |
+
+Registration, resend and verification answer identically whether or not the email has an account, so they cannot be used to discover accounts.
+
+## Lawyer verification
+
+| Method | Path                                                               | Role      | Purpose                                                     |
+| ------ | ------------------------------------------------------------------ | --------- | ----------------------------------------------------------- |
+| POST   | `/lawyer-applications`                                             | Signed in | Apply with bar council details and a PDF, PNG or JPEG proof |
+| GET    | `/lawyer-applications/me`                                          | Signed in | The applicant's current application                         |
+| GET    | `/admin/lawyer-applications`                                       | Admin     | List applications                                           |
+| GET    | `/admin/lawyer-applications/{application_id}`                      | Admin     | One application                                             |
+| POST   | `/admin/lawyer-applications/{application_id}/approve`              | Admin     | Approve and promote the user to `lawyer`                    |
+| POST   | `/admin/lawyer-applications/{application_id}/reject`               | Admin     | Reject, with a reason                                       |
+| POST   | `/admin/lawyer-applications/{application_id}/request-resubmission` | Admin     | Ask for a new submission, with a reason                     |
+
+## Queries
+
+| Method | Path                      | Role   | Body                                       | Response                    |
+| ------ | ------------------------- | ------ | ------------------------------------------ | --------------------------- |
+| POST   | `/query/public`           | Anyone | `{ "text": "…" }`                          | `PublicQueryResponse`       |
+| POST   | `/query/public/pdf`       | Anyone | form: `query`, `file` (PDF)                | `PublicQueryResponse`       |
+| POST   | `/query/professional`     | Lawyer | `{ "text": "…", "session_id"?: "…" }`      | `ProfessionalQueryResponse` |
+| POST   | `/query/professional/pdf` | Lawyer | form: `query`, `file` (PDF), `session_id`? | `ProfessionalQueryResponse` |
+
+- **Public responses** contain a plain-language explanation, the sections cited, sources (validated citations only) and `limitations`, such as an OCR confidence warning.
+- **Professional responses** contain identified sections, `precedents` (one per retrieved judgment, in rank order, with provenance, a verbatim excerpt, the raw reranker score, relative relevance and `cited_in_answer`) and a structured `case_brief`.
+- Uploaded PDFs are used for that request only and are never added to the corpus.
+- Public routes are limited per client IP (5 a minute, 100 a day by default) and professional routes per user (10 a minute, 300 a day).
+
+## Query history
+
+| Method | Path             | Role   | Purpose                                                               |
+| ------ | ---------------- | ------ | --------------------------------------------------------------------- |
+| GET    | `/query/history` | Lawyer | The user's recent professional queries and stored responses (`limit`) |
+| GET    | `/query-history` | Lawyer | Legacy alias of the same endpoint                                     |
+
+## Corpus ingestion
+
+| Method | Path                      | Role  | Purpose                                                                                |
+| ------ | ------------------------- | ----- | -------------------------------------------------------------------------------------- |
+| POST   | `/ingest/upload`          | Admin | Upload a trusted PDF with metadata; returns a persistent job ID                        |
+| GET    | `/ingest/status/{job_id}` | Admin | Stage, progress, chunk count, error code and `needs_reconciliation`                    |
+| GET    | `/ingest/corpus/stats`    | Admin | Corpus counts and PostgreSQL, Chroma and BM25 health (`healthy`, `degraded` or `down`) |
+
+Job stages: `QUEUED`, `EXTRACTING`, `CHUNKING`, `EMBEDDING`, `INDEXING`, then `COMPLETED` or `FAILED`.
+
+## Analytics
+
+All analytics endpoints require the Lawyer role and return `200 []` when there is no data.
+
+| Method | Path                              | Purpose                                               |
+| ------ | --------------------------------- | ----------------------------------------------------- |
+| GET    | `/analytics/offense-frequency`    | Offence citations by section and judgment year        |
+| GET    | `/analytics/outcome-distribution` | Outcomes by section and court level                   |
+| GET    | `/analytics/section-cooccurrence` | Pairs of offence sections cited together              |
+| GET    | `/analytics/ipc-bns-map`          | IPC-to-BNS mapping rows                               |
+| GET    | `/analytics/ncrb-stats`           | NCRB Table 1A.4 rows by year, State/UT and crime head |
+
+- Section labels are statute-qualified, such as `IPC 302` or `BNS 103`.
+- The first three count offence provisions only; `include_all_sections=true` returns every cited section.
+- `ncrb-stats` leaves out total and subtotal rows unless `include_aggregates=true`, so sums do not double count. Its `ipc_section` filter accepts `IPC 305`, `BNS 108` or a bare `305`.
+- Aliases `/analytics/offence-frequency`, `/analytics/ipc-bns` and `/analytics/ncrb` return the same data.
+
+## Error format
+
+Every error response, from any route, middleware or the framework, has the same body:
+
+```json
+{
+  "error": "Some of the submitted information is missing or invalid.",
+  "code": "VALIDATION_ERROR",
+  "detail": {
+    "fields": [{ "field": "body.email", "message": "Field required", "type": "missing" }]
+  }
+}
+```
+
+- `error` is a safe, human-readable message. It never contains a stack trace, a file path or a submitted value.
+- `code` is stable; clients branch on `code`, never on `error`.
+- `detail` holds structured data for some codes, otherwise `null`.
+- Every response carries an `X-Request-ID` header, and a `500` returns the request ID in `detail` so it can be matched to the server log.
+
+## Error-code catalogue
+
+### Framework and cross-cutting
+
+| Code                   | Status | Meaning                                             |
+| ---------------------- | ------ | --------------------------------------------------- |
+| `VALIDATION_ERROR`     | 422    | Missing or invalid fields (`detail.fields`)         |
+| `NOT_FOUND`            | 404    | No such path                                        |
+| `METHOD_NOT_ALLOWED`   | 405    | Path exists, method does not                        |
+| `INTERNAL_ERROR`       | 500    | Unexpected error (`detail.request_id`)              |
+| `REQUEST_TOO_LARGE`    | 413    | Body over the upload limit, rejected before reading |
+| `CSRF_ORIGIN_REJECTED` | 403    | Cookie-authenticated write from a disallowed origin |
+
+### Authentication and access
+
+| Code                                    | Status    | Meaning                                            |
+| --------------------------------------- | --------- | -------------------------------------------------- |
+| `NOT_AUTHENTICATED`                     | 401       | No session                                         |
+| `SESSION_EXPIRED`                       | 401       | The session token expired                          |
+| `INVALID_SESSION`                       | 401       | Invalid token, or a missing or deactivated account |
+| `FORBIDDEN`                             | 403       | Signed in, but the role may not use this route     |
+| `INVALID_CREDENTIALS`                   | 401       | Wrong email or password                            |
+| `LOGIN_THROTTLED`                       | 429       | Too many failed sign-ins (`Retry-After`)           |
+| `WEAK_PASSWORD`, `INVALID_EMAIL`        | 422       | Registration input rejected                        |
+| `EMAIL_DELIVERY_FAILED`                 | 503       | The verification email could not be sent           |
+| `INVALID_OTP`, `INVALID_OR_EXPIRED_OTP` | 400 / 422 | Wrong, malformed or expired code                   |
+| `OTP_ATTEMPTS_EXCEEDED`                 | 429       | Too many attempts for this code                    |
+
+### Lawyer verification
+
+| Code                                                                                     | Status | Meaning                               |
+| ---------------------------------------------------------------------------------------- | ------ | ------------------------------------- |
+| `ALREADY_VERIFIED`, `APPLICATION_ALREADY_PENDING`, `APPLICATION_ALREADY_VERIFIED`        | 409    | Nothing to apply for or approve       |
+| `EMAIL_VERIFICATION_REQUIRED`                                                            | 403    | Verify the email first                |
+| `INVALID_PROOF_TYPE`, `INVALID_PROOF_HEADER`                                             | 400    | Proof is not a valid PDF, PNG or JPEG |
+| `PROOF_TOO_LARGE`                                                                        | 413    | Proof over the upload limit           |
+| `APPLICATION_NOT_FOUND`                                                                  | 404    | No such application                   |
+| `APPLICATION_NOT_APPROVABLE`, `APPLICATION_NOT_REJECTABLE`, `APPLICATION_NOT_REVIEWABLE` | 409    | Not in a reviewable state             |
+| `REJECTION_REASON_REQUIRED`, `RESUBMISSION_REASON_REQUIRED`                              | 422    | A reason is required                  |
+
+### Uploads
+
+| Code                                                                                   | Status | Meaning                                                |
+| -------------------------------------------------------------------------------------- | ------ | ------------------------------------------------------ |
+| `INVALID_PDF_EXTENSION`, `INVALID_PDF_MIME_TYPE`, `INVALID_PDF_HEADER`, `EMPTY_UPLOAD` | 400    | Not a usable PDF                                       |
+| `PDF_TOO_LARGE`                                                                        | 413    | Over the configured size limit                         |
+| `DOCUMENT_ALREADY_INGESTED`                                                            | 409    | Same file already in the corpus (`detail.document_id`) |
+| `INGESTION_JOB_NOT_FOUND`                                                              | 404    | No such ingestion job                                  |
+| `PDF_PARSE_FAILED`, `PDF_NO_TEXT`, `PDF_CHUNKING_FAILED`                               | 422    | The PDF could not be read or split                     |
+| `OCR_LIMIT_EXCEEDED`                                                                   | 422    | Too many scanned pages, or OCR timed out               |
+| `OCR_UNAVAILABLE`                                                                      | 503    | A scanned PDF and Tesseract is not installed           |
+| `PDF_CONTEXT_TOO_LARGE`                                                                | 413    | The document is too large for one answer               |
+| `LOCAL_DOCUMENT_ANALYSIS_FAILED`                                                       | 500    | The document map could not be built                    |
+
+### Queries
+
+| Code                                                                                                                                                                               | Status | Meaning                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------- |
+| `RATE_LIMITED`                                                                                                                                                                     | 429    | Query limit reached (`Retry-After`)                              |
+| `MODEL_BUSY`                                                                                                                                                                       | 503    | All generation slots busy (`Retry-After: 15`)                    |
+| `INVALID_QUERY_REQUEST`                                                                                                                                                            | 422    | The question could not be processed                              |
+| `QUERY_PIPELINE_UNAVAILABLE`                                                                                                                                                       | 503    | The pipeline failed unexpectedly                                 |
+| `RETRIEVAL_UNAVAILABLE`, `RETRIEVAL_INDEX_UNAVAILABLE`                                                                                                                             | 503    | The evidence index is unavailable                                |
+| `INSUFFICIENT_RETRIEVED_AUTHORITY`                                                                                                                                                 | 424    | Not enough retrieved authority for a grounded answer             |
+| `MODEL_UNAVAILABLE`                                                                                                                                                                | 503    | No answer model configured or reachable                          |
+| `MODEL_PROVIDER_UNAVAILABLE`, `MODEL_PROVIDER_ERROR`, `MODEL_PROVIDER_TIMEOUT`, `MODEL_PROVIDER_AUTH_ERROR`                                                                        | 503    | The answer provider failed                                       |
+| `MODEL_PROVIDER_QUOTA_EXCEEDED`                                                                                                                                                    | 429    | The provider's usage limit was reached                           |
+| `MODEL_PROVIDER_REQUEST_TOO_LARGE`                                                                                                                                                 | 413    | Too large for the provider                                       |
+| `MODEL_OUTPUT_TRUNCATED`, `MODEL_OUTPUT_MISSING_CITATIONS`, `MODEL_OUTPUT_VALIDATION_FAILED`, `PUBLIC_SCHEMA_MISMATCH`, `PROFESSIONAL_SCHEMA_MISMATCH`, `ANSWER_GENERATION_FAILED` | 502    | The provider's answer was invalid or incomplete and is not shown |
+
+### Analytics and history
+
+| Code                       | Status | Meaning                              |
+| -------------------------- | ------ | ------------------------------------ |
+| `INVALID_ANALYTICS_FILTER` | 400    | An analytics filter value is invalid |
+| `INVALID_HISTORY_REQUEST`  | 400    | The history request is invalid       |
+
+Source: `docs/API_CONTRACTS.md` and the route definitions in `backend/app/api/` of the LegalAI repository.

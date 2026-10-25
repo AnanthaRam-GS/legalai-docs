@@ -11,6 +11,11 @@ export const docs: DocMeta[] = [
     title: "Getting started",
     description: "Prerequisites and a summary of local setup.",
   },
+  {
+    slug: "api-reference",
+    title: "API reference",
+    description: "Endpoints by group and role, and the error-code catalogue.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {
