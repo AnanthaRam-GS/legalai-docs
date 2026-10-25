@@ -16,6 +16,7 @@ import { Callout } from "@/components/ui/Callout";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Screenshot } from "@/components/ui/Screenshot";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { shots, type ShotMeta } from "@/content/screenshots";
 
 export const metadata: Metadata = {
   title: "Features",
@@ -30,7 +31,7 @@ interface FeatureSectionProps {
   title: string;
   intro: ReactNode;
   points: ReactNode[];
-  screenshot: { src?: string; alt: string; caption: string };
+  screenshot: ShotMeta;
   reverse?: boolean;
   children?: ReactNode;
 }
@@ -90,7 +91,7 @@ export default function FeaturesPage() {
       <PageHeader
         eyebrow="Features"
         title="What LegalAI can do today"
-        description="Everything on this page is implemented in the LegalAI repository. Screenshots will be added from the running application."
+        description="Everything on this page is implemented in the LegalAI repository. Screenshots come from the running application with real data; professional answers will follow once live provider capacity allows."
       />
       <Container>
         <FeatureSection
@@ -109,10 +110,7 @@ export default function FeaturesPage() {
             </>,
             "Per-IP rate limits (5 a minute, 100 a day by default) keep anonymous use within the answer provider's capacity.",
           ]}
-          screenshot={{
-            alt: "Public Mode question page with a plain-language answer and validated sources",
-            caption: "Public Mode: a question answered with validated sources.",
-          }}
+          screenshot={shots.publicAnswer}
         />
 
         <FeatureSection
@@ -141,10 +139,7 @@ export default function FeaturesPage() {
             </>,
             "Query history is kept per user, without any text quoted from uploaded documents.",
           ]}
-          screenshot={{
-            alt: "Professional Mode brief with precedents, relative relevance and cited badges",
-            caption: "Professional Mode: a structured brief with ranked precedents.",
-          }}
+          screenshot={shots.professionalAnswer}
         >
           <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted">
             <StatusBadge status="blocked" />
@@ -164,10 +159,7 @@ export default function FeaturesPage() {
               <strong>{name}:</strong> {body}
             </>
           ))}
-          screenshot={{
-            alt: "Analytics dashboard with offence trends chart",
-            caption: "Analytics: offence trends by year.",
-          }}
+          screenshot={shots.analyticsTrends}
         >
           <Callout kind="warning">
             Sections and outcomes are extracted from judgments by deterministic rules, and the
@@ -190,10 +182,7 @@ export default function FeaturesPage() {
             "The status page reports each store as healthy, degraded or down, compares vector and keyword counts with PostgreSQL, and lists jobs that need reconciliation.",
             "Administrators also review lawyer verification applications.",
           ]}
-          screenshot={{
-            alt: "Admin status page showing PostgreSQL, Chroma and BM25 health",
-            caption: "Admin: store health and ingestion jobs.",
-          }}
+          screenshot={shots.adminStatus}
         />
 
         <FeatureSection
@@ -208,10 +197,7 @@ export default function FeaturesPage() {
             "When any OCR'd page has low confidence (below 80), the answer carries a warning to check names, dates and figures against the original.",
             "Page and time limits (10 pages for a query, 200 for ingestion) stop oversized scans; nothing partial is answered.",
           ]}
-          screenshot={{
-            alt: "Answer for a scanned FIR showing the low-confidence OCR note",
-            caption: "OCR: a scanned FIR with its confidence note.",
-          }}
+          screenshot={shots.ocr}
         />
 
         <FeatureSection
@@ -228,10 +214,7 @@ export default function FeaturesPage() {
             "Lawyer verification proofs are private and are never indexed or sent to the answer model.",
             "The session token lives in an HttpOnly cookie that page scripts cannot read.",
           ]}
-          screenshot={{
-            alt: "Professional upload page explaining that the document stays private",
-            caption: "Private upload: analysed for one request, never ingested.",
-          }}
+          screenshot={shots.professionalHome}
         />
       </Container>
     </>

@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Screenshot } from "@/components/ui/Screenshot";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
+import { shots } from "@/content/screenshots";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -13,12 +14,22 @@ export const metadata: Metadata = {
 };
 
 const gallery = [
-  { alt: "Public Mode home with the question box", caption: "Public Mode home" },
-  { alt: "Public answer with validated sources", caption: "Plain-language answer" },
-  { alt: "Professional query page with a structured brief", caption: "Professional brief" },
-  { alt: "Precedent cards with relative relevance and cited badges", caption: "Ranked precedents" },
-  { alt: "Analytics dashboard, NCRB statistics tab", caption: "Analytics: NCRB statistics" },
-  { alt: "Admin status page with store health", caption: "Admin store status" },
+  shots.publicHome,
+  shots.publicAnswer,
+  shots.publicAnswerSources,
+  shots.publicAnswerMobile,
+  shots.login,
+  shots.professionalHome,
+  shots.analyticsTrends,
+  shots.analyticsOutcomes,
+  shots.analyticsCooccurrence,
+  shots.analyticsIpcBns,
+  shots.analyticsNcrb,
+  shots.history,
+  shots.adminStatus,
+  shots.adminIngest,
+  shots.professionalAnswer,
+  shots.professionalBrief,
 ];
 
 export default function DemoPage() {
@@ -27,7 +38,7 @@ export default function DemoPage() {
       <PageHeader
         eyebrow="Demo"
         title="See LegalAI in use"
-        description="A recorded walkthrough of the running application, and screenshots of each mode."
+        description="A recorded walkthrough of the running application, and screenshots of each mode with real data. Select a screenshot to open it full size."
       />
       <Container className="py-16">
         <section aria-labelledby="video">
@@ -43,7 +54,7 @@ export default function DemoPage() {
           <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {gallery.map((shot) => (
               <li key={shot.caption}>
-                <Screenshot alt={shot.alt} caption={shot.caption} />
+                <Screenshot {...shot} />
               </li>
             ))}
           </ul>
