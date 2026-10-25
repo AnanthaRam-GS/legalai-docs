@@ -36,6 +36,11 @@ export const docs: DocMeta[] = [
     title: "Limitations and legal disclaimer",
     description: "What LegalAI cannot do, and how its output should be read.",
   },
+  {
+    slug: "glossary",
+    title: "Glossary",
+    description: "Legal and technical terms used on this site.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {

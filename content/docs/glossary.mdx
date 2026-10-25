@@ -1,0 +1,67 @@
+Terms used across this site, grouped by area. Legal definitions are simplified for orientation and are not legal advice.
+
+## Indian criminal law
+
+| Term                         | Meaning                                                                                                                                |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **IPC**                      | Indian Penal Code, 1860: the substantive criminal law defining offences and punishments until it was replaced by the BNS.              |
+| **BNS**                      | Bharatiya Nyaya Sanhita: the code that replaced the IPC from 1 July 2024.                                                              |
+| **CrPC**                     | Code of Criminal Procedure: the procedural code (arrest, bail, investigation, trial, appeal) replaced by the BNSS.                     |
+| **BNSS**                     | Bharatiya Nagarik Suraksha Sanhita: the procedural code that replaced the CrPC from 1 July 2024.                                       |
+| **Legal regime**             | Whether a matter falls under the old codes (IPC/CrPC), the new codes (BNS/BNSS) or both, usually depending on the date of the offence. |
+| **FIR**                      | First Information Report: the police record that starts a criminal case.                                                               |
+| **Charge sheet**             | The police report filed in court at the end of an investigation.                                                                       |
+| **Bail / anticipatory bail** | Release from custody pending trial; anticipatory bail is sought before an expected arrest.                                             |
+| **Quashing**                 | A High Court setting aside criminal proceedings, for example under CrPC 482.                                                           |
+| **Precedent**                | An earlier judgment relied on for its reasoning in a later case.                                                                       |
+| **Offence provision**        | A section that defines an offence (such as IPC 302), as opposed to procedural, evidentiary or definitional sections.                   |
+| **NDPS, POCSO, SC/ST Act**   | Special criminal statutes on narcotics, child sexual offences and atrocities against Scheduled Castes and Tribes.                      |
+| **NCRB**                     | National Crime Records Bureau, which publishes the annual _Crime in India_ statistics.                                                 |
+
+## Retrieval and AI
+
+| Term                         | Meaning                                                                                                                           |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **RAG**                      | Retrieval-augmented generation: retrieve relevant passages first, then have a language model answer only from them.               |
+| **LLM**                      | Large language model; LegalAI uses one only for the final, evidence-bound answer.                                                 |
+| **Chunk**                    | A passage of a judgment (a run of paragraphs) that is indexed and retrieved as a unit.                                            |
+| **Embedding**                | A vector representing a passage's meaning, so similar passages are close together.                                                |
+| **BGE-M3**                   | The multilingual embedding model LegalAI uses for dense retrieval (1024 dimensions).                                              |
+| **Dense retrieval**          | Finding passages whose embeddings are closest to the query's embedding.                                                           |
+| **Vector store / Chroma**    | The database holding the chunk embeddings for dense retrieval.                                                                    |
+| **BM25**                     | A keyword-ranking formula that rewards rare terms, good at exact section numbers and legal terms.                                 |
+| **Hybrid retrieval**         | Running dense and BM25 retrieval together, because they find different relevant passages.                                         |
+| **RRF**                      | Reciprocal rank fusion: merges ranked lists by summing 1 / (k + rank); LegalAI uses k = 60.                                       |
+| **Reranker / cross-encoder** | A model that reads the query and a passage together and scores how well they match; slower but more precise than retrieval alone. |
+| **Evidence ID**              | A label (E1, E2…) given to each retrieved passage so the answer can cite it; P# labels mark excerpts from a private upload.       |
+| **Citation validation**      | Checking that each citation in an answer points to evidence that was actually supplied, with matching metadata.                   |
+| **No-coverage answer**       | The explicit reply given when nothing relevant was retrieved, instead of a general-knowledge answer.                              |
+| **Relative relevance**       | Reranker scores rescaled within one answer so the top precedent is 1.0; a ranking, not a probability.                             |
+| **Hallucination**            | A fluent model output that is not supported by any source, such as an invented case.                                              |
+| **NER**                      | Named-entity recognition: finding statutes, sections, courts and other entities in text.                                          |
+| **InLegalBERT**              | A language model pre-trained on Indian legal text, evaluated for NER but not adopted.                                             |
+| **OCR / Tesseract**          | Optical character recognition, reading text from scanned page images; Tesseract is the engine used.                               |
+
+## Evaluation
+
+| Term                         | Meaning                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Relevance judgment**       | A person's grade of how relevant a retrieved passage is to a query (0, 1 or 2 here).                          |
+| **Broad / strict relevance** | Counting grades 1 and 2 as relevant, or only grade 2.                                                         |
+| **Precision@5 (P@5)**        | The share of the top five results that are relevant.                                                          |
+| **Recall@k (pooled)**        | The share of known relevant passages found in the top k, where "known" means found by any system in the pool. |
+| **MRR@5**                    | Mean reciprocal rank: on average, how close to the top the first relevant result appears.                     |
+| **nDCG@5**                   | A ranking score that rewards placing highly relevant results first.                                           |
+| **Bootstrap**                | Resampling the queries many times to estimate how much a metric could vary.                                   |
+| **p50 / p95**                | The median and the 95th-percentile latency.                                                                   |
+
+## Engineering
+
+| Term                | Meaning                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| **JWT**             | JSON Web Token: the signed session token, kept in an HttpOnly cookie.                   |
+| **HttpOnly cookie** | A cookie that page scripts cannot read, which limits token theft.                       |
+| **CSRF**            | Cross-site request forgery: a malicious site making a signed-in browser send a request. |
+| **MPS**             | Metal Performance Shaders: running models on an Apple silicon GPU.                      |
+| **fp16 / fp32**     | Half- and single-precision numbers; fp16 is faster with slightly different scores.      |
+| **Static export**   | Building a website as plain files that any static host can serve, as this site is.      |
