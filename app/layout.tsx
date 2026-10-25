@@ -1,12 +1,21 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Navbar } from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { site } from "@/content/site";
 import { inter, sourceSerif } from "@/lib/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LegalAI",
-  description: "Project documentation for LegalAI.",
+  title: { default: `${site.name}: Project documentation`, template: `%s | ${site.name}` },
+  description: site.description,
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f7fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1120" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -16,8 +25,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${inter.variable} ${sourceSerif.variable}`}
       suppressHydrationWarning
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="flex min-h-dvh flex-col">
+        <ThemeProvider>
+          <a href="#main" className="skip-link">
+            Skip to content
+          </a>
+          <Navbar />
+          <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
