@@ -44,8 +44,19 @@ function Table(props: ComponentPropsWithoutRef<"table">) {
   );
 }
 
+// A trailing space keeps adjacent cells apart in the search index.
+function Th({ children, ...props }: ComponentPropsWithoutRef<"th">) {
+  return <th {...props}>{children} </th>;
+}
+
+function Td({ children, ...props }: ComponentPropsWithoutRef<"td">) {
+  return <td {...props}>{children} </td>;
+}
+
 const components: MDXComponents = {
   a: Anchor,
+  th: Th,
+  td: Td,
   pre: Pre,
   table: Table,
   Callout,

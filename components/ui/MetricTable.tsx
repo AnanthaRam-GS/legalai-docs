@@ -29,7 +29,7 @@ export function MetricTable({ caption, columns, rows, footnote }: MetricTablePro
       >
         <table className="w-full min-w-[32rem] border-collapse text-sm">
           <caption className="border-b border-border px-4 py-3 text-left font-semibold text-fg">
-            {caption}
+            {caption}{" "}
           </caption>
           <thead className="bg-surface-2">
             <tr>
@@ -39,7 +39,7 @@ export function MetricTable({ caption, columns, rows, footnote }: MetricTablePro
                   scope="col"
                   className={`px-4 py-2.5 font-semibold text-fg ${column.numeric ? "text-right" : "text-left"}`}
                 >
-                  {column.label}
+                  {column.label}{" "}
                 </th>
               ))}
             </tr>
@@ -60,7 +60,7 @@ export function MetricTable({ caption, columns, rows, footnote }: MetricTablePro
                         column.numeric ? "text-right tabular-nums" : "text-left"
                       } ${columnIndex === 0 ? "font-medium text-fg" : "text-muted"}`}
                     >
-                      {row[column.key]}
+                      {row[column.key]}{" "}
                     </Cell>
                   );
                 })}

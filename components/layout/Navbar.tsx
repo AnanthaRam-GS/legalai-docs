@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
+import { SearchDialog } from "@/components/search/SearchDialog";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { isActive, mainNav } from "@/lib/nav";
 import { Logo } from "./Logo";
@@ -49,6 +50,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1">
+          <SearchDialog />
           <ThemeToggle />
           <button
             ref={openButtonRef}

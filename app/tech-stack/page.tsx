@@ -212,11 +212,11 @@ export default function TechStackPage() {
                 {DEVIATIONS.map((row) => (
                   <tr key={row.component} className="border-t border-border align-top">
                     <th scope="row" className="px-4 py-3 text-left font-semibold">
-                      {row.component}
+                      {row.component}{" "}
                     </th>
-                    <td className="px-4 py-3 text-muted">{row.planned}</td>
-                    <td className="px-4 py-3 text-fg">{row.implemented}</td>
-                    <td className="px-4 py-3 text-muted">{row.reason}</td>
+                    <td className="px-4 py-3 text-muted">{row.planned} </td>
+                    <td className="px-4 py-3 text-fg">{row.implemented} </td>
+                    <td className="px-4 py-3 text-muted">{row.reason} </td>
                     <td className="px-4 py-3">
                       {row.status === "as-planned" ? (
                         <StatusBadge status="completed" label="As planned" />

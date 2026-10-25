@@ -51,7 +51,7 @@ function ResultSection({
 
 const Meta = ({ children }: { children: ReactNode }) => (
   <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-medium text-fg">
-    {children}
+    {children}{" "}
   </span>
 );
 

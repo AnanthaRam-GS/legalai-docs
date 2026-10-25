@@ -22,7 +22,7 @@ export function StatusBadge({ status, label }: { status: Status; label?: string 
       className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ${className}`}
     >
       <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-      {label ?? defaultLabel}
+      {label ?? defaultLabel}{" "}
     </span>
   );
 }
