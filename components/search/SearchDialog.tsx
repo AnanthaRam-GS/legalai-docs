@@ -43,6 +43,7 @@ function loadPagefind(): Promise<Pagefind | null> {
     pagefindPromise = import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
       .then(async (module: Pagefind) => {
         await module.init();
+        void warmIndex();
         return module;
       })
       .catch(() => null);
@@ -56,6 +57,19 @@ const ROUTE_LABELS = new Map<string, string>([
   ...mainNav.map((item) => [item.href, item.label] as [string, string]),
   ...docs.map((doc) => [`/docs/${doc.slug}/`, `Docs: ${doc.title}`] as [string, string]),
 ]);
+
+/**
+ * Pagefind fetches index chunks lazily, per query. Fetching every chunk once puts
+ * them in the HTTP cache (they are immutable), so later searches work offline.
+ */
+async function warmIndex(): Promise<void> {
+  try {
+    const files: string[] = await (await fetch("/pagefind/manifest.json")).json();
+    await Promise.all(files.map((file) => fetch(file).catch(() => undefined)));
+  } catch {
+    // Without the manifest, search still works online.
+  }
+}
 
 /** Turns Pagefind's /path/index.html URLs into the site's trailing-slash routes. */
 function toRoute(url: string): string {
@@ -72,6 +86,7 @@ export function SearchDialog() {
   const [hits, setHits] = useState<Hit[]>([]);
   const [active, setActive] = useState(0);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "unavailable">("idle");
+  const [failed, setFailed] = useState(false);
 
   const open = useCallback(() => {
     const dialog = dialogRef.current;
@@ -106,23 +121,32 @@ export function SearchDialog() {
       return;
     }
     void (async () => {
-      const pagefind = await loadPagefind();
-      const search = await pagefind?.debouncedSearch(term);
-      if (!search || cancelled) return;
-      const data = await Promise.all(
-        search.results.slice(0, MAX_RESULTS).map(async (result) => {
-          const item = await result.data();
-          return {
-            id: result.id,
-            url: toRoute(item.url),
-            title: ROUTE_LABELS.get(toRoute(item.url)) ?? item.meta.title ?? item.url,
-            excerpt: item.excerpt,
-          };
-        }),
-      );
-      if (!cancelled) {
-        setHits(data);
-        setActive(0);
+      try {
+        const pagefind = await loadPagefind();
+        const search = await pagefind?.debouncedSearch(term);
+        if (!search || cancelled) return;
+        const data = await Promise.all(
+          search.results.slice(0, MAX_RESULTS).map(async (result) => {
+            const item = await result.data();
+            return {
+              id: result.id,
+              url: toRoute(item.url),
+              title: ROUTE_LABELS.get(toRoute(item.url)) ?? item.meta.title ?? item.url,
+              excerpt: item.excerpt,
+            };
+          }),
+        );
+        if (!cancelled) {
+          setHits(data);
+          setActive(0);
+          setFailed(false);
+        }
+      } catch {
+        // A chunk could not be fetched (for example offline before the index was cached).
+        if (!cancelled) {
+          setHits([]);
+          setFailed(true);
+        }
       }
     })();
     return () => {
@@ -213,6 +237,10 @@ export function SearchDialog() {
           ) : status === "unavailable" ? (
             <p className="px-3 py-6 text-sm text-muted">
               Search is available in the built site (run <code>npm run build</code>).
+            </p>
+          ) : failed ? (
+            <p className="px-3 py-6 text-sm text-muted" role="status">
+              Search could not load part of its index. Check your connection and try again.
             </p>
           ) : query.trim() && hits.length === 0 ? (
             <p className="px-3 py-6 text-sm text-muted">No results for “{query.trim()}”.</p>

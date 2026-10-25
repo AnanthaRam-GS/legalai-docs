@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:links": "node scripts/check-links.mjs",
-    "postbuild": "pagefind --site out --output-subdir pagefind"
+    "postbuild": "pagefind --site out --output-subdir pagefind && node scripts/pagefind-manifest.mjs"
   },
   "engines": {
     "node": ">=20.9"
