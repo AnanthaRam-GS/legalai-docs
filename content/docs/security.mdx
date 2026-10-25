@@ -1,0 +1,59 @@
+LegalAI handles legal questions and private documents, so it limits what it stores, who can see what, and how much an anonymous caller can use. The hardening below was completed in October 2026 and is tracked as items SEC-001 to SEC-010.
+
+## Accounts and sessions
+
+- **Roles** are `public`, `lawyer` and `admin`. Registration only ever creates `public` accounts; a role sent by the client is ignored.
+- **Lawyer access** is granted only when an administrator approves an application with bar council credentials and a proof document.
+- **Sessions** are JWTs in an `HttpOnly` cookie with an explicit `SameSite` setting, marked `Secure` in production. Page scripts cannot read the token.
+- **Every request** reloads the user from the database, so a deactivated account is blocked immediately and the role in the token is never trusted.
+- **Startup checks** refuse to run with a missing, short (under 32 bytes) or known default JWT secret, and refuse production if any account still has a historical development password.
+
+## Sign-in protection
+
+- Unknown email, wrong password and deactivated account all return the same `401`, with matching timing.
+- Failed sign-ins are counted per account (5) and per IP (20) within 15 minutes; past either limit, sign-in returns `429 LOGIN_THROTTLED` for 15 minutes.
+- Registration, resending a code and verifying a code give the same answer whether or not an email has an account, so accounts cannot be discovered.
+
+## Request limits
+
+| Limit                          | Default                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| Public queries, per client IP  | 5 per minute, 100 per day                                                             |
+| Professional queries, per user | 10 per minute, 300 per day                                                            |
+| Concurrent answer generations  | 4, with a 10-second wait before `503 MODEL_BUSY`                                      |
+| Upload size                    | Rejected with `413` from the `Content-Length` header, and streamed with an early stop |
+
+`X-Forwarded-For` is trusted only from configured proxies, so a client cannot spoof its IP to escape the limits.
+
+## Cross-site request forgery
+
+Two layers protect cookie-authenticated writes:
+
+1. The `SameSite` cookie is not sent on cross-site `POST`s, iframes or subresource requests.
+2. An Origin check rejects any cookie-carrying `POST`, `PUT`, `PATCH` or `DELETE` from an origin outside the allow-list with `403 CSRF_ORIGIN_REJECTED`.
+
+## Privacy of uploads
+
+- A PDF uploaded with a question is parsed in a temporary directory for that request and **never enters the corpus**: no ingestion job, no vector or keyword index write.
+- Query history keeps the question and answer but never PDF bytes, extracted text, temporary chunks, server paths or any item quoted from the upload.
+- Lawyer verification proofs are private; they are not indexed or sent to the answer model.
+- Error responses never contain stack traces, file paths, submitted values or provider secrets, and ingestion errors store only a sanitized message.
+
+## Data handling in development
+
+- Secrets live in an untracked `.env`; the repository holds only `.env.example` with names, not values.
+- Backups contain user data, so the backup tool refuses destinations inside the repository.
+- Tests run against a separate `_test` database with all external credentials blanked.
+
+## Residual risks
+
+<Callout kind="warning" title="Accepted or open">
+  - **No token revocation:** logout clears the cookie, but a copied token stays valid until it
+  expires (60 minutes). Deactivation still blocks it immediately. - **In-memory limits:** rate
+  limits and the generation cap are per process and reset on restart; scaling out needs a shared
+  store. - **Dependencies:** a dependency scan fixed every critical and high finding with a
+  non-breaking upgrade. Remaining findings are recorded with their exposure: some need a FastAPI
+  upgrade, and the Chroma advisories affect its server mode, which LegalAI does not run.
+</Callout>
+
+Source: `docs/SECURITY.md`, `docs/API_CONTRACTS.md` and `docs/INGESTION_RELIABILITY.md` in the LegalAI repository.

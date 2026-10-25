@@ -21,6 +21,11 @@ export const docs: DocMeta[] = [
     title: "Data sources and attribution",
     description: "Where the judgments, statistics and mappings come from.",
   },
+  {
+    slug: "security",
+    title: "Security and privacy",
+    description: "Authentication, rate limits, CSRF defence and how uploads are handled.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {
