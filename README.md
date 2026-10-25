@@ -141,7 +141,9 @@ Never add secrets, `.env` values, credentials, user data, judgment text or inter
 
 `npm run build` runs `pagefind --site out` afterwards (the `postbuild` script). Only each page's
 `<main>` is indexed and the 404 page is excluded. The search dialog (navbar button or ⌘K / Ctrl+K)
-loads `/pagefind/pagefind.js` on first use. To keep an element out of the index, add
+loads `/pagefind/pagefind.js` on first use and then fetches every file listed in
+`/pagefind/manifest.json` (written by `scripts/pagefind-manifest.mjs`), so search keeps working
+offline once the site has been opened. To keep an element out of the index, add
 `data-pagefind-ignore`.
 
 ## Deploying to Vercel
@@ -193,6 +195,6 @@ content/
   SOURCES.md         Claim → source mapping
 lib/                 Navigation, fonts, formatting, hooks
 public/screenshots/  Product screenshots (WebP)
-scripts/             Link checker, screenshot capture
+scripts/             Link checker, screenshot capture, search manifest
 vercel.json          Security headers and caching
 ```
