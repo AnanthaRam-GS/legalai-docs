@@ -49,9 +49,9 @@ export default async function DocPage({ params }: DocPageProps) {
         </p>
         <DocPager slug={slug} />
       </article>
-      <aside className="hidden xl:block">
+      <div className="hidden xl:block">
         <TableOfContents />
-      </aside>
+      </div>
     </div>
   );
 }
