@@ -26,6 +26,11 @@ export const docs: DocMeta[] = [
     title: "Security and privacy",
     description: "Authentication, rate limits, CSRF defence and how uploads are handled.",
   },
+  {
+    slug: "testing",
+    title: "Testing and QA",
+    description: "Test suites, the isolated test database and data-change safeguards.",
+  },
 ];
 
 export function getDoc(slug: string): DocMeta | undefined {

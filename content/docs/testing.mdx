@@ -1,0 +1,50 @@
+LegalAI is tested at three levels: fast unit and contract tests, database-backed integration tests on an isolated database, and supervised live runs against real models. Data changes have their own safeguards.
+
+## Test suites at a glance
+
+| Suite          | Runner                     | Size on `main` (24 October 2026) |
+| -------------- | -------------------------- | -------------------------------- |
+| Backend tests  | Python `unittest`          | 938 test methods in 80 modules   |
+| Frontend tests | Vitest and Testing Library | 291 test cases in 40 files       |
+
+These are counts of tests defined in the code at commit `28b23d9`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+
+## Isolated test database
+
+Database-backed modules import a bootstrap before anything else. It:
+
+1. Requires `TEST_DATABASE_URL` and aborts unless the database name ends in `_test` and differs from the development database.
+2. Migrates the test database to the latest schema.
+3. Redirects Chroma, BM25, uploads and verification proofs to a temporary directory that is deleted on exit.
+4. Blanks every external credential, forces console email, and blocks network and SMTP connections.
+5. Blocks loading the real embedding and reranking models unless explicitly allowed, and keeps Hugging Face offline.
+
+Every test starts from truncated tables. This setup exists because earlier test runs had written fixtures into the development database; the [reconciliation](/results/#reconciliation) cleaned that up.
+
+## Contract tests
+
+- **Error contract:** a test calls every registered route in every way it can fail and checks that each error has the `{error, code, detail}` shape.
+- **Negative authorization:** a database suite checks that each role is refused the routes it may not use.
+- **Model devices:** rankings on all 30 benchmark queries must be identical on CPU and Apple MPS; a slow mocked PDF query must not block `/health`.
+- **OCR:** fixture scans must reach at least 95% character accuracy; tests skip with a reason when Tesseract is missing.
+- **NCRB extraction:** the extractor's output must be byte-for-byte reproducible from the recorded PDF.
+
+## Before and after any data change
+
+1. **Snapshot** row counts (read-only) and file hashes of every store.
+2. **Back up** the database and both indexes, with a checksum manifest, outside the repository.
+3. **Verify the backup** by restoring it into a separate rehearsal database and comparing counts.
+4. **Rehearse** the change on the rehearsal database and store copies: dry run, run, second run (which must make 0 changes).
+5. **Run on development** the same way, then confirm the analytics verifier reports `RECONCILED` and the store verifier reports `CONSISTENT`.
+
+## Supervised live runs
+
+Live runs send real questions through the full pipeline with a live answer model, record identifiers, timings and pass/fail checks in the repository, and keep full responses outside it for legal review. Each run checks that sources are validated citations only, that excerpts and evidence references resolve to real chunks, and that no stack trace reaches the user.
+
+## Not yet in place
+
+- **Continuous integration** for both suites on every pull request <StatusBadge status="in-progress" />
+- **User acceptance testing** with law students or practitioners and with non-technical users <StatusBadge status="planned" />
+- **Live professional runs**, blocked by provider capacity <StatusBadge status="blocked" />
+
+Source: `docs/TESTING.md`, `docs/OCR.md`, `docs/performance/PERFORMANCE_BASELINE.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository; test counts from `backend/scripts/tests/` and the frontend test files on `main`.
