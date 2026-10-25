@@ -1,18 +1,17 @@
 import { ImageResponse } from "next/og";
 import { site } from "@/content/site";
 
-export const dynamic = "force-static";
-export const alt = "LegalAI: An Intelligent Criminal Legal Assistance and Analytics System";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+export const SHARE_CARD_ALT =
+  "LegalAI: An Intelligent Criminal Legal Assistance and Analytics System";
+export const SHARE_CARD_SIZE = { width: 1200, height: 630 };
 
 const NAVY = "#0d1b33";
 const GOLD = "#e3b65c";
 const INK = "#e6ebf3";
 const MUTED = "#a9b7cf";
 
-/** The share card, rendered to a static PNG at build time. */
-export default function OpenGraphImage() {
+/** The 1200x630 share card, rendered to /og.png at build time by app/og.png/route.tsx. */
+export function renderShareCard() {
   return new ImageResponse(
     <div
       style={{
@@ -82,6 +81,6 @@ export default function OpenGraphImage() {
         <div style={{ color: GOLD }}>{new URL(site.siteUrl).host}</div>
       </div>
     </div>,
-    size,
+    SHARE_CARD_SIZE,
   );
 }

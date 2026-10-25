@@ -170,7 +170,7 @@ curl -sI https://legalai-docs.vercel.app/ | grep -iE "content-security|x-frame|r
 curl -s https://legalai-docs.vercel.app/sitemap.xml | head
 ```
 
-Share cards come from `app/opengraph-image.tsx` (rendered at build time); `sitemap.xml` and
+The share card is `components/seo/ShareCard.tsx`, rendered to `/og.png` at build time by `app/og.png/route.tsx`; `sitemap.xml` and
 `robots.txt` come from `app/sitemap.ts` and `app/robots.ts`.
 
 ## Project structure

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { SHARE_CARD_ALT, SHARE_CARD_SIZE } from "@/components/seo/ShareCard";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { site } from "@/content/site";
 import { inter, sourceSerif } from "@/lib/fonts";
@@ -20,8 +21,14 @@ export const metadata: Metadata = {
     description: site.description,
     locale: "en_IN",
     url: "/",
+    images: [{ url: "/og.png", ...SHARE_CARD_SIZE, alt: SHARE_CARD_ALT, type: "image/png" }],
   },
-  twitter: { card: "summary_large_image", title: site.title, description: site.description },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.description,
+    images: [{ url: "/og.png", alt: SHARE_CARD_ALT }],
+  },
 };
 
 export const viewport: Viewport = {
