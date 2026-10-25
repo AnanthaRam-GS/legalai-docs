@@ -2,7 +2,7 @@
 
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useSyncExternalStore } from "react";
+import { useMounted } from "@/lib/useMounted";
 
 const ORDER = ["system", "light", "dark"] as const;
 type ThemeChoice = (typeof ORDER)[number];
@@ -13,17 +13,11 @@ const LABELS: Record<ThemeChoice, string> = {
   dark: "Dark theme",
 };
 
-const subscribe = () => () => {};
-
 /** Cycles system → light → dark. The label names the current choice. */
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   // The stored theme is only known in the browser; render a stable icon on the server.
-  const mounted = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
+  const mounted = useMounted();
 
   const current: ThemeChoice =
     mounted && ORDER.includes(theme as ThemeChoice) ? (theme as ThemeChoice) : "system";

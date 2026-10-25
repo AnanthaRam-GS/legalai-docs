@@ -88,7 +88,7 @@ export function LayerDiagram() {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       <div
         role="tablist"
         aria-label="System layers"

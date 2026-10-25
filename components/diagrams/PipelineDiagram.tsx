@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, ArrowRight, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useMounted } from "@/lib/useMounted";
 
 interface Stage {
   id: string;
@@ -77,10 +78,12 @@ const STEP_MS = 1800;
 
 export function PipelineDiagram() {
   const reduceMotion = useReducedMotion();
+  // The motion preference is unknown on the server, so autoplay starts after hydration.
+  const mounted = useMounted();
   const [active, setActive] = useState(0);
   // null = follow the reduced-motion preference; true/false = the user's explicit choice.
   const [userPlaying, setUserPlaying] = useState<boolean | null>(null);
-  const playing = userPlaying ?? !reduceMotion;
+  const playing = userPlaying ?? (mounted && !reduceMotion);
 
   useEffect(() => {
     if (!playing) return;
