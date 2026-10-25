@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/Container";
-import { Callout } from "@/components/ui/Callout";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Screenshot } from "@/components/ui/Screenshot";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -47,7 +46,6 @@ export default function DemoPage() {
             Demo video
           </h2>
           <VideoEmbed url={site.demoVideoUrl} title="LegalAI demo walkthrough" />
-          <Callout kind="disclaimer">{site.disclaimer}</Callout>
         </section>
 
         <section aria-labelledby="gallery" className="mt-20">

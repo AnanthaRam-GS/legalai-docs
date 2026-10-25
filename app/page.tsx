@@ -147,7 +147,6 @@ export default function HomePage() {
               Documentation
             </Link>
           </div>
-          <p className="mt-8 text-sm text-navy-muted">Research prototype. Not legal advice.</p>
         </Container>
       </section>
 

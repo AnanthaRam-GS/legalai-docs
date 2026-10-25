@@ -11,11 +11,9 @@ import {
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
-import { Callout } from "@/components/ui/Callout";
 import { FeatureCard } from "@/components/ui/FeatureCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { site } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "Problem and objectives",
@@ -60,7 +58,7 @@ const inScope = [
 ];
 
 const nonGoals = [
-  "Giving legal advice or predicting the outcome of a case.",
+  "Predicting the outcome of a case.",
   "Treating predicted sections as legal conclusions; they are supplementary retrieval signals only.",
   "Adding user uploads to the corpus; only administrators ingest trusted documents.",
   "Comprehensive coverage of all Indian case law at this stage.",
@@ -190,7 +188,6 @@ export default function OverviewPage() {
               </Reveal>
             ))}
           </div>
-          <Callout kind="disclaimer">{site.disclaimer}</Callout>
         </section>
       </Container>
     </>

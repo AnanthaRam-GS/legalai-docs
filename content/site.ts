@@ -87,8 +87,6 @@ export const site = {
   lastUpdated: "2026-10-25",
   /** Commit of the LegalAI main branch that the facts on this site describe. */
   sourceCommit: "ed3cc76",
-  disclaimer:
-    "LegalAI is a research prototype built for an academic project. It does not provide legal advice, and its output must not be relied on as a substitute for a qualified lawyer.",
 } as const;
 
 export const guide: Person = {

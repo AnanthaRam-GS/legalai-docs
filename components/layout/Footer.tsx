@@ -58,11 +58,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 rounded-lg border border-border bg-surface-2 p-4 text-sm text-muted">
-          <strong className="text-fg">Disclaimer.</strong> {site.disclaimer}
-        </div>
-
-        <div className="mt-6 flex flex-col gap-2 text-xs text-subtle sm:flex-row sm:justify-between">
+        <div className="mt-10 flex flex-col gap-2 text-xs text-subtle sm:flex-row sm:justify-between">
           <p>
             Last updated <time dateTime={site.lastUpdated}>{formatDate(site.lastUpdated)}</time>
           </p>
