@@ -48,12 +48,11 @@ Two layers protect cookie-authenticated writes:
 ## Residual risks
 
 <Callout kind="warning" title="Accepted or open">
-  - **No token revocation:** logout clears the cookie, but a copied token stays valid until it
-  expires (60 minutes). Deactivation still blocks it immediately. - **In-memory limits:** rate
-  limits and the generation cap are per process and reset on restart; scaling out needs a shared
-  store. - **Dependencies:** a dependency scan fixed every critical and high finding with a
-  non-breaking upgrade. Remaining findings are recorded with their exposure: some need a FastAPI
-  upgrade, and the Chroma advisories affect its server mode, which LegalAI does not run.
+
+- **No token revocation:** logout clears the cookie, but a copied token stays valid until it expires (60 minutes). Deactivation still blocks it immediately.
+- **In-memory limits:** rate limits and the generation cap are per process and reset on restart; scaling out needs a shared store.
+- **Dependencies:** a dependency scan fixed every critical and high finding with a non-breaking upgrade. Remaining findings are recorded with their exposure: some need a FastAPI upgrade, and the Chroma advisories affect its server mode, which LegalAI does not run.
+
 </Callout>
 
 Source: `docs/SECURITY.md`, `docs/API_CONTRACTS.md` and `docs/INGESTION_RELIABILITY.md` in the LegalAI repository.
