@@ -1,9 +1,4 @@
-<Callout kind="disclaimer" title="Not legal advice">
-  LegalAI is a research prototype built for an academic project. It does not provide legal advice,
-  and its output must not be relied on as a substitute for a qualified lawyer. Always check an
-  answer against the cited judgment and the current statute, and consult a lawyer before acting on
-  it.
-</Callout>
+These are the known technical limits of LegalAI as it stands, by area.
 
 ## Coverage
 
@@ -16,7 +11,7 @@
 - **Grounding is checked structurally.** Citation validation confirms that each claim cites evidence that was actually retrieved, with matching metadata. It does not prove that the cited passage supports the claim in a legal sense.
 - **Relative relevance is not a probability.** It ranks precedents within one answer; a score of 1.0 means "best of these five", not "certainly relevant".
 - **Predicted sections are signals,** used to guide retrieval, not legal conclusions.
-- **OCR can misread scans.** Low-confidence pages are flagged, but names, dates and figures from scans should be checked against the original.
+- **OCR is English by default and can misread scans.** Other languages need extra Tesseract language data and a configuration change. Low-confidence pages are flagged, but names, dates and figures from scans should be checked against the original.
 - **Professional answers are not available live** on the current provider tier: the professional answer does not fit the provider's output limits. This is a capacity limit, not a design choice, and it is being worked on.
 
 ## Analytics

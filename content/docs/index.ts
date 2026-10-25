@@ -33,8 +33,9 @@ export const docs: DocMeta[] = [
   },
   {
     slug: "limitations",
-    title: "Limitations and legal disclaimer",
-    description: "What LegalAI cannot do, and how its output should be read.",
+    title: "Limitations",
+    description:
+      "Known technical limits of the corpus, answers, analytics, evaluation and engineering.",
   },
   {
     slug: "glossary",
