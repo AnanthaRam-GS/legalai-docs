@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { site } from "@/content/site";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main id="main" tabIndex={-1} className="flex-1 focus:outline-none">
             {children}
           </main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
