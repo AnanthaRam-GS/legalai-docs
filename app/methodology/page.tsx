@@ -4,7 +4,6 @@ import { Container } from "@/components/layout/Container";
 import { Callout } from "@/components/ui/Callout";
 import { MetricTable } from "@/components/ui/MetricTable";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export const metadata: Metadata = {
   title: "Methodology",
@@ -272,13 +271,12 @@ export default function MethodologyPage() {
             </li>
             <li>
               <strong>Pull requests.</strong> Work lands on main through feature branches and
-              reviewed pull requests (66 so far).
+              reviewed pull requests (67 so far).
             </li>
-            <li className="flex flex-wrap items-center gap-2">
-              <span>
-                <strong>Continuous integration</strong> for the backend and frontend suites.
-              </span>
-              <StatusBadge status="in-progress" />
+            <li>
+              <strong>Continuous integration.</strong> GitHub Actions runs the backend, database,
+              frontend and Playwright end-to-end suites on every pull request and push to main,
+              without secrets, model downloads or the real corpus.
             </li>
           </ul>
         </Section>

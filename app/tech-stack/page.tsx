@@ -30,6 +30,7 @@ const LAYERS: { name: string; icon: LucideIcon; items: Tech[] }[] = [
       { name: "Tailwind CSS 4", detail: "Styling" },
       { name: "Recharts 3", detail: "Analytics dashboard" },
       { name: "Vitest + Testing Library", detail: "Component and page tests" },
+      { name: "Playwright", detail: "End-to-end browser journeys" },
     ],
   },
   {
@@ -70,6 +71,7 @@ const LAYERS: { name: string; icon: LucideIcon; items: Tech[] }[] = [
     icon: Wrench,
     items: [
       { name: "GitHub pull requests", detail: "Feature branches into main" },
+      { name: "GitHub Actions", detail: "CI: backend, database, frontend and e2e jobs" },
       { name: "ESLint + Prettier", detail: "Frontend lint and format" },
       { name: "npm audit + pip-audit", detail: "Dependency scanning" },
       { name: "PyTorch on MPS", detail: "Local model inference on Apple silicon" },
@@ -175,7 +177,7 @@ export default function TechStackPage() {
             ))}
           </div>
           <p className="mt-4 text-xs text-subtle">
-            Versions as pinned in the LegalAI repository at commit 28b23d9: frontend/package.json
+            Versions as pinned in the LegalAI repository at commit ed3cc76: frontend/package.json
             and requirements.txt.
           </p>
         </section>

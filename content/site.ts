@@ -84,7 +84,7 @@ export const site = {
   /** ISO date of the last content review. */
   lastUpdated: "2026-10-25",
   /** Commit of the LegalAI main branch that the facts on this site describe. */
-  sourceCommit: "28b23d9",
+  sourceCommit: "ed3cc76",
   disclaimer:
     "LegalAI is a research prototype built for an academic project. It does not provide legal advice, and its output must not be relied on as a substitute for a qualified lawyer.",
 } as const;
@@ -213,11 +213,11 @@ export const stats: Stat[] = [
   {
     id: "backend-tests",
     label: "Backend test cases",
-    value: 938,
-    detail: "across 80 Python test modules",
+    value: 951,
+    detail: "across 81 Python test modules",
     sample: "Test methods defined on main (static count, not a pass count)",
-    asOf: "2026-10-24",
-    source: "backend/scripts/tests/test_*.py on main @ 28b23d9",
+    asOf: "2026-10-25",
+    source: "backend/scripts/tests/test_*.py on main @ ed3cc76",
     status: "completed",
   },
   {
@@ -226,8 +226,8 @@ export const stats: Stat[] = [
     value: 291,
     detail: "across 40 Vitest files",
     sample: "Test cases defined on main (static count, not a pass count)",
-    asOf: "2026-10-24",
-    source: "frontend/**/*.test.ts(x) on main @ 28b23d9",
+    asOf: "2026-10-25",
+    source: "frontend/**/*.test.ts(x) on main @ ed3cc76",
     status: "completed",
   },
   {
@@ -334,7 +334,7 @@ export const phases: Phase[] = [
         status: "blocked",
         note: "Blocked by LLM provider capacity: the professional answer does not fit the current token limits.",
       },
-      { label: "Continuous integration", status: "in-progress" },
+      { label: "Continuous integration and end-to-end tests", status: "completed" },
       { label: "Deployment", status: "planned" },
       { label: "User acceptance testing", status: "planned" },
     ],
@@ -512,11 +512,11 @@ export const milestones: Milestone[] = [
   },
   {
     date: "2026-10-25",
-    title: "Continuous integration",
+    title: "Continuous integration and end-to-end tests",
     description:
-      "A CI workflow for the backend and frontend suites is being prepared; it is not yet merged.",
-    refs: "Work in progress",
-    status: "in-progress",
+      "GitHub Actions runs the backend, database, frontend and Playwright end-to-end suites on every pull request, with no secrets; the 15 browser journeys use test-only fake providers.",
+    refs: "PR #67",
+    status: "completed",
   },
 ];
 
@@ -540,9 +540,10 @@ export const roadmap: RoadmapItem[] = [
     status: "planned",
   },
   {
-    title: "Continuous integration",
-    description: "Run the backend and frontend suites on every pull request.",
-    status: "in-progress",
+    title: "Serialise model inference on Apple MPS",
+    description:
+      "When start-up warm-up overlapped the first request, the backend crashed in the embedding model on MPS. Inference on one MPS model is not yet serialised, so the end-to-end real mode runs with warm-up off until this is fixed.",
+    status: "planned",
   },
   {
     title: "Deployment",
