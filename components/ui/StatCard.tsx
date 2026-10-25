@@ -11,7 +11,7 @@ export function StatCard({ stat }: { stat: Stat }) {
         <figcaption className="text-sm font-semibold text-muted">{stat.label}</figcaption>
         {stat.status === "historical" ? <StatusBadge status="historical" /> : null}
       </div>
-      <p className="mt-3 font-serif text-4xl font-bold text-fg tabular-nums">
+      <p className="mt-3 text-4xl font-bold tracking-tight text-fg">
         <CountUp
           value={stat.value}
           decimals={stat.decimals}

@@ -33,7 +33,7 @@ export function Callout({ kind = "info", title, children }: CalloutProps) {
       aria-label={title ?? label}
     >
       <Icon className={`mt-0.5 h-5 w-5 shrink-0 ${ICON_COLOUR[kind]}`} aria-hidden="true" />
-      <div className="min-w-0 text-sm leading-6 [&>p+p]:mt-2">
+      <div className="min-w-0 text-sm leading-6 [overflow-wrap:anywhere] [&>p+p]:mt-2">
         <p className="font-semibold">{title ?? label}</p>
         <div className="mt-1 text-fg/90 [&_p+p]:mt-2">{children}</div>
       </div>
