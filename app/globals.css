@@ -240,6 +240,18 @@
     opacity: 1;
     transform: none;
   }
+
+  /* Safety net: if the app bundle never hydrates, show the content anyway. */
+  .js [data-reveal]:not([data-shown]) {
+    animation: reveal-fallback 0s 3s forwards;
+  }
+}
+
+@keyframes reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Long-form documentation (MDX) typography. */
