@@ -20,6 +20,10 @@ const gallery = [
   shots.publicAnswerMobile,
   shots.login,
   shots.professionalHome,
+  shots.professionalAnswer,
+  shots.professionalPrecedents,
+  shots.professionalBrief,
+  shots.professionalBriefDetail,
   shots.analyticsTrends,
   shots.analyticsOutcomes,
   shots.analyticsCooccurrence,
@@ -28,8 +32,6 @@ const gallery = [
   shots.history,
   shots.adminStatus,
   shots.adminIngest,
-  shots.professionalAnswer,
-  shots.professionalBrief,
 ];
 
 export default function DemoPage() {

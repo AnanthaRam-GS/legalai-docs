@@ -13,8 +13,6 @@ export interface ShotMeta {
   placeholder?: string;
 }
 
-const PENDING_PROVIDER = "Coming soon — pending live provider capacity";
-
 export const shots = {
   publicHome: {
     src: "/screenshots/public-home.webp",
@@ -94,14 +92,28 @@ export const shots = {
     caption: "Admin ingestion, idle: uploads need an explicit permanent-update confirmation.",
   },
   professionalAnswer: {
-    alt: "Professional answer with ranked precedents, relative relevance and cited badges",
-    caption: "Professional answer with ranked precedents.",
-    placeholder: PENDING_PROVIDER,
+    src: "/screenshots/professional-answer.webp",
+    alt: "Professional text answer on dowry death under IPC 304B and the presumption under Section 113B of the Evidence Act, with identified sections and the structured case brief",
+    caption:
+      "A live professional answer on dowry death (IPC 304B) and the Section 113B presumption, from gpt-oss-120b with prompt v3 (captured 8 November 2026).",
+  },
+  professionalPrecedents: {
+    src: "/screenshots/professional-precedents.webp",
+    alt: "The same answer's precedents tab: two judgments marked Cited in answer, with relative relevance of 100% and 0%, court, year and excerpt source; case titles and excerpts blurred",
+    caption:
+      "The same answer's precedents, both cited in the answer. Relative relevance scales the reranker scores within this answer (top = 100%, lowest = 0%); it is not a probability. Case titles and excerpts are blurred.",
   },
   professionalBrief: {
-    alt: "Structured brief from a private PDF with parties, chronology, procedural stages and evidence",
-    caption: "Structured brief from a private PDF.",
-    placeholder: PENDING_PROVIDER,
+    src: "/screenshots/professional-brief.webp",
+    alt: "Brief from an uploaded synthetic FIR PDF with identified sections, parties and roles with page references, applicable law and procedural considerations",
+    caption:
+      "A live brief from a synthetic FIR (invented names and places), uploaded privately. Parties and procedural steps come with page references such as [P1, pp. 1-2]. The model's one-line section labels are wrong here: BNS 309(4) is robbery and BNS 115(2) is voluntarily causing hurt, and Section 173 is in the BNSS. This is why answers must be checked against the statute.",
+  },
+  professionalBriefDetail: {
+    src: "/screenshots/professional-brief-detail.webp",
+    alt: "The same brief's dated chronology, explicit provisions, evidence by category and key legal issues, each item with a page reference",
+    caption:
+      "The same brief further down: a dated chronology and evidence by category (witness, electronic, medical), each with its page reference. The model also noted that the FIR's dates fall before the BNS took effect on 1 July 2024.",
   },
   ocr: {
     alt: "Answer for a scanned FIR showing the low-confidence OCR note",
