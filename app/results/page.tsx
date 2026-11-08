@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { ChartFrame } from "@/components/charts/ChartFrame";
+import { GroundingChart } from "@/components/charts/GroundingChart";
 import { LatencyChart } from "@/components/charts/LatencyChart";
 import { RetrievalChart } from "@/components/charts/RetrievalChart";
 import { Container } from "@/components/layout/Container";
@@ -12,12 +13,13 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 export const metadata: Metadata = {
   title: "Results",
   description:
-    "Retrieval quality, reranker latency, OCR accuracy, citation validity, NCRB validation and store reconciliation, each with its sample size, date and source.",
+    "The October 2026 three-configuration evaluation, retrieval quality, reranker latency, OCR accuracy, citation validity, NCRB validation and store reconciliation, each with its sample size, date and source.",
   alternates: { canonical: "/results/" },
 };
 
 const toc = [
-  { id: "retrieval", label: "Retrieval quality" },
+  { id: "evaluation-2026-10", label: "October 2026 evaluation" },
+  { id: "retrieval", label: "Retrieval quality (historical)" },
   { id: "latency", label: "Latency" },
   { id: "ocr", label: "OCR accuracy" },
   { id: "citations", label: "Citation validity" },
@@ -82,8 +84,207 @@ export default function ResultsPage() {
 
       <Container className="space-y-16 py-16">
         <ResultSection
+          id="evaluation-2026-10"
+          title="October 2026 evaluation: LLM-only vs dense RAG vs full LegalAI"
+          meta={
+            <>
+              <StatusBadge status="completed" />
+              <Meta>30 queries × 3 configurations</Meta>
+              <Meta>Groq gpt-oss-120b / 20b, prompt v3</Meta>
+              <Meta>30 October – 1 November 2026</Meta>
+              <Meta>Human review pending</Meta>
+            </>
+          }
+        >
+          <p>
+            The frozen benchmarks were re-run on the current corpus and product. Retrieval was
+            re-scored against the frozen human labels; answers were generated for the 30 frozen
+            answer-evaluation queries (15 public, 15 professional) under three configurations:
+          </p>
+          <ul className="mt-3 list-disc space-y-1 pl-5">
+            <li>
+              <strong>A, LLM only:</strong> no evidence; a v3-style prompt that forbids invented
+              authority.
+            </li>
+            <li>
+              <strong>B, dense RAG:</strong> BGE-M3 dense top 5 only (no BM25, fusion or reranker),
+              prompt v3.
+            </li>
+            <li>
+              <strong>C, full LegalAI:</strong> hybrid BM25 + dense fusion and the BGE reranker, top
+              5, prompt v3, through the product&rsquo;s own generation and citation validation.
+            </li>
+          </ul>
+
+          <h3 className="mt-8 font-serif text-xl font-bold text-fg">Retrieval re-run</h3>
+          <MetricTable
+            caption="Retrieval re-run on the frozen 30-query benchmark (broad relevance unless marked strict)"
+            columns={[
+              { key: "system", label: "System" },
+              { key: "p5", label: "P@5", numeric: true },
+              { key: "r5", label: "Pooled R@5", numeric: true },
+              { key: "r20", label: "Pooled R@20", numeric: true },
+              { key: "mrr", label: "MRR@5", numeric: true },
+              { key: "ndcg", label: "nDCG@5", numeric: true },
+              { key: "p5s", label: "P@5 strict", numeric: true },
+              { key: "same", label: "Rankings equal to frozen", numeric: true },
+            ]}
+            rows={[
+              {
+                system: "BM25",
+                p5: "0.833",
+                r5: "0.277",
+                r20: "0.673",
+                mrr: "0.917",
+                ndcg: "0.728",
+                p5s: "0.533",
+                same: "30/30",
+              },
+              {
+                system: "Dense (BGE-M3)",
+                p5: "0.860",
+                r5: "0.284",
+                r20: "0.686",
+                mrr: "0.942",
+                ndcg: "0.786",
+                p5s: "0.593",
+                same: "30/30",
+              },
+              {
+                system: "Hybrid (RRF)",
+                p5: "0.873",
+                r5: "0.286",
+                r20: "0.705",
+                mrr: "0.961",
+                ndcg: "0.785 (frozen 0.787)",
+                p5s: "0.587 (frozen 0.593)",
+                same: "29/30",
+              },
+              {
+                system: "Hybrid + Rerank",
+                p5: "0.873",
+                r5: "0.290",
+                r20: "0.723",
+                mrr: "0.961",
+                ndcg: "0.819",
+                p5s: "0.633",
+                same: "30/30",
+                highlight: true,
+              },
+            ]}
+            footnote="Source: docs/evaluation/EVALUATION_2026-10.md, section 2, and data/evaluation/runs/2026-10_v3_groq/retrieval/ (re-run 30 October 2026). 30 queries, 695 frozen human labels. Recall is pooled recall: relevant means judged relevant within the pool, so it understates recall against the whole corpus."
+          />
+          <p>
+            Every value equals the frozen September result except hybrid nDCG@5 and strict P@5,
+            which differ in one query (eval-q005): one chunk now also appears at dense rank 20, the
+            edge of the dense candidate list, which moves it from hybrid rank 11 to 5. The full
+            pipeline (Hybrid + Rerank) is unchanged. The frozen benchmark files were only read;
+            their hashes were checked before and after.
+          </p>
+
+          <h3 className="mt-8 font-serif text-xl font-bold text-fg">Answer generation</h3>
+          <ChartFrame
+            title="Answers with at least one validly cited claim"
+            description="Share of schema-valid answers in which at least one claim cites retrieved evidence that passed validation. Higher is better; the y-axis starts at zero."
+            footnote="Source: docs/evaluation/EVALUATION_2026-10.md, section 3 (Results). Paired: the 24 queries all three configurations answered (13 public, 11 professional). Public and professional: all schema-valid answers of each mode (A 15 and 12, B 15 and 14, C 13 and 15). A has no evidence, so it is 0% by construction."
+          >
+            <GroundingChart />
+          </ChartFrame>
+          <MetricTable
+            caption="Three-configuration generation results"
+            columns={[
+              { key: "measure", label: "Measure" },
+              { key: "a", label: "A, LLM only", numeric: true },
+              { key: "b", label: "B, dense RAG", numeric: true },
+              { key: "c", label: "C, full LegalAI", numeric: true },
+            ]}
+            rows={[
+              {
+                measure: "Paired (24 queries): answers with ≥1 valid grounded claim",
+                a: "0%",
+                b: "87.5% (21/24)",
+                c: "95.8% (23/24)",
+                highlight: true,
+              },
+              {
+                measure: "Paired: valid / total citations",
+                a: "0 / 0",
+                b: "71 / 71",
+                c: "73 / 73",
+              },
+              {
+                measure: "Schema pass, all 30 queries",
+                a: "27 / 30",
+                b: "29 / 30",
+                c: "28 / 30",
+              },
+              {
+                measure: "Schema pass, public (15)",
+                a: "15 / 15",
+                b: "15 / 15",
+                c: "13 / 15",
+              },
+              {
+                measure: "Schema pass, professional (15)",
+                a: "12 / 15",
+                b: "14 / 15",
+                c: "15 / 15",
+              },
+              {
+                measure: "Valid / total citations, all 30 queries",
+                a: "0 / 0",
+                b: "84 / 86",
+                c: "85 / 85",
+              },
+              {
+                measure: "Grounded answers, public / professional",
+                a: "0% / 0%",
+                b: "80.0% / 92.9%",
+                c: "92.3% / 93.3%",
+              },
+              {
+                measure: "Out-of-scope queries answered “not covered” (4)",
+                a: "0 / 4",
+                b: "2 / 4",
+                c: "1 / 4",
+              },
+            ]}
+            footnote="Source: docs/evaluation/EVALUATION_2026-10.md and data/evaluation/runs/2026-10_v3_groq/generation/summary.json. Public half run on 30 October 2026, professional half on 31 October, the last cell on 1 November. 84 of 90 records are schema-valid; the 6 that are not are 2 schema failures, 3 provider JSON errors (HTTP 400) and 1 busy refusal, reported as recorded."
+          />
+          <Callout kind="warning" title="Caveats for the October 2026 evaluation">
+            <ul className="list-disc space-y-2 pl-5">
+              <li>
+                <strong>Structural, not human-verified.</strong> A valid citation points at real
+                retrieved evidence with matching metadata; it does not prove the evidence supports
+                the claim or that the law is right. A blinded human review of 15 queries × 3
+                configurations has been prepared and is <strong>pending</strong>.{" "}
+                <StatusBadge status="planned" label="Pending" />
+              </li>
+              <li>
+                <strong>Unsupported case names in the answer text.</strong> The validator checks
+                structured citations only. C named 2 real cases that are not in its retrieved
+                evidence, and B named 1, in the answer text; A named 4 cases from memory. A check of
+                case names in the answer text is recorded as a future improvement.
+              </li>
+              <li>
+                <strong>Provider and prompt.</strong> Answers came from Groq: professional answers
+                from gpt-oss-120b only, public answers from gpt-oss-20b or, when it was at capacity,
+                gpt-oss-120b. All used prompt v3. Differences of a few answers are within noise.
+              </li>
+              <li>
+                <strong>Historical Gemini run.</strong> The frozen September 2026 answer evaluation
+                used Gemini (gemini-3.6-flash) with prompt v1: in its grounded condition 29 of 30
+                answers parsed and 23 were structurally grounded. It is kept unchanged as a
+                historical baseline and is not directly comparable with this run.{" "}
+                <StatusBadge status="historical" />
+              </li>
+            </ul>
+          </Callout>
+        </ResultSection>
+
+        <ResultSection
           id="retrieval"
-          title="Retrieval quality"
+          title="Retrieval quality (frozen benchmark)"
           meta={
             <>
               <StatusBadge status="historical" />
@@ -173,7 +374,8 @@ export default function ResultsPage() {
             <p>
               Limits: a single reviewer, pooled rather than exhaustive judgments, only 3
               transition-law queries, a benchmark built from the same small corpus, and retrieval
-              only (not answer quality). Expansion towards about 100 queries is planned.
+              only (not answer quality). Expansion towards about 100 queries is in progress with a
+              labelling kit.
             </p>
           </Callout>
         </ResultSection>
@@ -276,12 +478,12 @@ export default function ResultsPage() {
 
         <ResultSection
           id="citations"
-          title="Citation validity: prompt v1 vs v2"
+          title="Citation validity across prompt versions"
           meta={
             <>
               <StatusBadge status="historical" />
-              <Meta>Supervised live runs, steps 11–11d</Meta>
-              <Meta>19–20 October 2026</Meta>
+              <Meta>Supervised live runs, steps 11–11d and 22</Meta>
+              <Meta>19–30 October 2026</Meta>
             </>
           }
         >
@@ -295,19 +497,24 @@ export default function ResultsPage() {
             rows={[
               { prompt: "v1 (baseline)", valid: "3 of 7", runs: "Steps 11 and 11b" },
               {
-                prompt: "v2 (current)",
+                prompt: "v2",
                 valid: "5 of 5",
                 runs: "2 public runs in step 11d, plus 2 correct no-coverage answers",
+              },
+              {
+                prompt: "v3 (current)",
+                valid: "41 of 41",
+                runs: "13 runs on gpt-oss-120b in step 22: 4 public, 3 professional, 5 PDF briefs and 1 question on a PDF, including 2 correct no-coverage answers",
                 highlight: true,
               },
             ]}
-            footnote="Source: docs/live_runs/LIVE_RUN_SUMMARY.md (2026-10-20)."
+            footnote="Source: docs/live_runs/LIVE_RUN_SUMMARY.md (v1 and v2, 2026-10-20; v3, Step 22 live runs, 2026-10-30) and docs/LLM_PROVIDER_CONFIGURATION.md, Step 22."
           />
-          <Callout kind="warning" title="Very small sample">
-            Twelve citations across a handful of runs show a direction, not a rate. Professional
-            runs could not be completed on the current provider tier: the professional answer
-            exceeded the output-token limit even at low reasoning effort.{" "}
-            <StatusBadge status="blocked" />
+          <Callout kind="warning" title="Small samples">
+            These are supervised runs of a few hand-picked cases, so they show a direction, not a
+            rate. Until step 22 the professional answer exceeded the provider&rsquo;s output limit;
+            prompt v3&rsquo;s length rules made professional answers and PDF briefs fit, and the
+            October evaluation above measures them on 30 queries.
           </Callout>
         </ResultSection>
 
