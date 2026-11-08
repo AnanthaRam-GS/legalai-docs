@@ -217,6 +217,28 @@ async function captureProfessional(browser: Browser): Promise<void> {
     await shoot(page, "history");
   }
 
+  if (wanted("professional-precedents")) {
+    // No LLM call: reopens the newest stored professional answer from History on its
+    // precedents tab. Case titles and excerpts are judgment text, so they are blurred.
+    await page.goto(`${FRONTEND}/professional/history`);
+    await settle(page);
+    await page.getByRole("button", { name: "View Stored Brief" }).first().click();
+    await page
+      .getByRole("button", { name: /^Precedent Citations/ })
+      .first()
+      .click();
+    await page.addStyleTag({
+      content: `[data-testid="citation-card"] h3, [data-testid="citation-card"] p.italic { filter: blur(6px); }`,
+    });
+    await settle(page, 600);
+    await page
+      .locator('[data-testid="citation-card"]')
+      .first()
+      .evaluate((node) => node.scrollIntoView({ block: "center" }));
+    await page.waitForTimeout(400);
+    await shoot(page, "professional-precedents");
+  }
+
   if (includeProfessional && allowLive && wanted("professional-answer")) {
     await page.goto(`${FRONTEND}/professional/query`);
     await settle(page);
@@ -239,10 +261,9 @@ async function captureProfessional(browser: Browser): Promise<void> {
     await page.goto(`${FRONTEND}/professional/upload`);
     await settle(page);
     await page.locator("input[type=file]").setInputFiles(process.env.SHOT_BRIEF_PDF);
-    const query = page.locator("main textarea");
-    if (await query.count()) await query.first().fill(requireEnv("SHOT_PROFESSIONAL_QUESTION"));
+    // The upload page collects no question: the brief is built from the document alone.
     await liveQuery(page, "/query/professional/pdf", () =>
-      page.locator("main button[type=submit]").first().click(),
+      page.getByRole("button", { name: "Begin Private Analysis" }).click(),
     );
     await settle(page, 1500);
     await saveRaw(page, "professional-brief");

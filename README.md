@@ -111,22 +111,29 @@ Never add secrets, `.env` values, credentials, user data, judgment text or inter
 2. Install the browser once: `npx playwright-core install chromium`.
 3. Provide the accounts through environment variables (never commit or print them):
 
-   | Variable                                       | Purpose                                                               |
-   | ---------------------------------------------- | --------------------------------------------------------------------- |
-   | `SHOT_LAWYER_EMAIL`, `SHOT_LAWYER_PASSWORD`    | A lawyer account (analytics, history)                                 |
-   | `SHOT_ADMIN_EMAIL`, `SHOT_ADMIN_PASSWORD`      | An admin account (status, ingestion page)                             |
-   | `SHOT_PUBLIC_QUESTION`                         | The question for the live public answer                               |
-   | `SHOT_PROFESSIONAL_QUESTION`, `SHOT_BRIEF_PDF` | Only with `--professional`                                            |
-   | `SHOT_FRONTEND_URL`                            | Defaults to `http://127.0.0.1:3000`                                   |
-   | `SHOT_RAW_DIR`                                 | Optional folder outside the repo for full-page copies of live answers |
+   | Variable                                       | Purpose                                                                                                     |
+   | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+   | `SHOT_LAWYER_EMAIL`, `SHOT_LAWYER_PASSWORD`    | A lawyer account (analytics, history)                                                                       |
+   | `SHOT_ADMIN_EMAIL`, `SHOT_ADMIN_PASSWORD`      | An admin account (status, ingestion page)                                                                   |
+   | `SHOT_PUBLIC_QUESTION`                         | The question for the live public answer                                                                     |
+   | `SHOT_PROFESSIONAL_QUESTION`, `SHOT_BRIEF_PDF` | Only with `--professional`: the text question, and the PDF for the brief (the upload page asks no question) |
+   | `SHOT_FRONTEND_URL`                            | Defaults to `http://127.0.0.1:3000`                                                                         |
+   | `SHOT_RAW_DIR`                                 | Optional folder outside the repo for full-page copies of live answers                                       |
 
 4. Run it:
 
    ```bash
    node --experimental-strip-types scripts/capture-screenshots.ts --no-live        # no LLM calls
    node --experimental-strip-types scripts/capture-screenshots.ts --only=public-answer,public-answer-sources,public-answer-mobile
-   node --experimental-strip-types scripts/capture-screenshots.ts --professional --only=professional-answer,professional-brief
+   node --experimental-strip-types scripts/capture-screenshots.ts --professional --only=professional-answer,professional-brief --max-live-calls=2
+   node --experimental-strip-types scripts/capture-screenshots.ts --no-live --only=professional-precedents
    ```
+
+   `professional-precedents` makes no LLM call: it reopens the newest stored professional answer from
+   History on its precedents tab, with case titles and excerpts blurred. For the brief, use a synthetic
+   fixture: LegalAI's `backend/scripts/tests/brief_fixtures.py` renders
+   `backend/scripts/tests/fixtures/briefs/fir_synthetic.txt` to a PDF (`write_fixture_pdf("fir", <dir>)`).
+   Check `/health` → `llm_daily` first: a professional answer needs about 8,000 free tokens on gpt-oss-120b.
 
    Each live answer costs one LLM call and `--max-live-calls` (default 1) caps them. The script
    never uploads to the corpus, hides the Next.js dev badge, blurs case titles in the sources
