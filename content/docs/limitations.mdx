@@ -9,28 +9,34 @@ These are the known technical limits of LegalAI as it stands, by area.
 ## Answers
 
 - **Grounding is checked structurally.** Citation validation confirms that each claim cites evidence that was actually retrieved, with matching metadata. It does not prove that the cited passage supports the claim in a legal sense.
+- **Case names in the answer text are not validated.** Only structured citations are checked. In the October 2026 evaluation the full pipeline named 2 real cases in its answer text that were not in its retrieved evidence.
+- **Model-written labels can be wrong.** Short descriptions the model writes, such as a section's one-line label, are not checked against the statute (see the brief screenshot on the [Demo](/demo/) page).
 - **Relative relevance is not a probability.** It ranks precedents within one answer; a score of 1.0 means "best of these five", not "certainly relevant".
 - **Predicted sections are signals,** used to guide retrieval, not legal conclusions.
 - **OCR is English by default and can misread scans.** Other languages need extra Tesseract language data and a configuration change. Low-confidence pages are flagged, but names, dates and figures from scans should be checked against the original.
-- **Professional answers are not available live** on the current provider tier: the professional answer does not fit the provider's output limits. This is a capacity limit, not a design choice, and it is being worked on.
+
+## Capacity
+
+- **Free-tier answer capacity.** Answers come from Groq's free tier, which allows each model about 8,000 tokens a minute and 200,000 tokens in a rolling 24 hours. One answer uses roughly 6,000–7,000 tokens, so a day allows about **30 answers per model**, and professional answers use one model only (gpt-oss-120b): about **30 professional answers a day** in total.
+- At busy moments answers wait in a queue (up to 90 seconds, or 45 seconds for a professional answer) and then return a "busy" message with a retry time; when the day's capacity is used up, LegalAI says when to try again.
+- Because of this, the evaluation, user acceptance testing and the demo are scheduled on **separate days**. A paid tier would raise both limits without code changes.
 
 ## Analytics
 
 - Cited sections and outcomes are extracted by rules and are **unreviewed** until a qualified reviewer checks them. Outcome fields are empty when the rules find nothing or find conflicting values.
-- The IPC-to-BNS mapping is a comparative reference, not statutory text, and is **unreviewed**; seven pairs printed by NCRB are missing from it.
+- The IPC-to-BNS mapping is a comparative reference, not statutory text, and is **unreviewed**. Its 68 NCRB-sourced rows have no change type, because NCRB does not print one, and CYTRAIN rows that cover several IPC sections under one group label are not split.
 - NCRB figures are 2024 registrations. They do not describe convictions, acquittals or trends across years.
 
 ## Evaluation
 
-- Retrieval quality was measured on **30 queries** labelled by **one reviewer**, using pooled rather than exhaustive relevance, over the same small corpus. The figures are historical and descriptive, not statistically significant.
-- Citation validity under the current prompt rests on a **handful of live runs** (5 of 5 citations valid).
+- Retrieval quality was measured on **30 queries** labelled by **one reviewer**, using pooled rather than exhaustive relevance, over the same small corpus. The figures are descriptive, not statistically significant; an expansion by about 70 queries is in progress.
+- The October 2026 answer evaluation covers **30 queries** (24 answered by all three configurations) and its grounding is **structural**; the human review of a 15-query sample is pending.
 - There has been **no user acceptance testing** yet.
 
 ## Engineering
 
-- Rate limits and the generation cap live in memory, so they reset on restart and do not span several server processes.
+- Per-IP and per-user rate limits, the generation cap and the answer-model queue live in memory, so they reset on restart and do not span several server processes. Only the daily model usage is saved to disk.
 - Logout does not revoke a copied token before it expires (60 minutes).
-- Model inference on Apple MPS is not serialised: in end-to-end testing, start-up warm-up overlapping the first request crashed the backend, so that test mode runs with warm-up off until it is fixed.
 - The system has not yet been deployed.
 
-Source: `docs/RETRIEVAL_EVALUATION_RESULTS.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/OCR.md`, `docs/SECURITY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository.
+Source: `docs/RETRIEVAL_EVALUATION_RESULTS.md`, `docs/evaluation/EVALUATION_2026-10.md`, `docs/LLM_PROVIDER_CONFIGURATION.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/OCR.md`, `docs/SECURITY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository.

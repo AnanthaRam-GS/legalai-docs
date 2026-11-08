@@ -92,7 +92,7 @@ export default function FeaturesPage() {
       <PageHeader
         eyebrow="Features"
         title="What LegalAI can do today"
-        description="Everything on this page is implemented in the LegalAI repository. Screenshots come from the running application with real data; professional answers will follow once live provider capacity allows."
+        description="Everything on this page is implemented in the LegalAI repository. Screenshots come from the running application with real data, and the professional ones from live answers."
       />
       <Container>
         <FeatureSection
@@ -110,6 +110,14 @@ export default function FeaturesPage() {
               no provisions, sources or general-knowledge legal answer.
             </>,
             "Per-IP rate limits (5 a minute, 100 a day by default) keep anonymous use within the answer provider's capacity.",
+            <>
+              <strong>Busy and capacity messages:</strong> an answer that waits more than 5 seconds
+              in the queue for the answer model shows &ldquo;High demand — your answer is queued and
+              will appear shortly.&rdquo; If no capacity frees up in time, the page says LegalAI is
+              busy and to try again in a minute; when the day&rsquo;s model capacity is used up, it
+              says when to try again (&ldquo;Today&rsquo;s AI capacity has been reached — please try
+              again after …&rdquo;).
+            </>,
           ]}
           screenshot={shots.publicAnswer}
         />
@@ -140,12 +148,12 @@ export default function FeaturesPage() {
             </>,
             "Query history is kept per user, without any text quoted from uploaded documents.",
           ]}
-          screenshot={shots.professionalAnswer}
+          screenshot={shots.professionalPrecedents}
         >
           <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-muted">
-            <StatusBadge status="blocked" />
-            Live professional runs are blocked by LLM provider capacity; the flow is covered by
-            tests.
+            <StatusBadge status="completed" />
+            Professional answers and PDF briefs run live on Groq gpt-oss-120b. They wait up to 45
+            seconds for that model rather than switching to a smaller one.
           </div>
         </FeatureSection>
 
@@ -179,7 +187,7 @@ export default function FeaturesPage() {
           points={[
             "Upload PDFs with metadata and follow each job through QUEUED, EXTRACTING, CHUNKING, EMBEDDING and INDEXING to COMPLETED or FAILED.",
             "Ingestion is all-or-nothing: a completed job is in PostgreSQL, Chroma and BM25; a failed job leaves nothing behind.",
-            "Re-uploading an identical file is refused before anything is written.",
+            "Re-uploading an identical file is refused before anything is written, with a plain message: “This document is already in the corpus”, naming the existing document's ID when it is known.",
             "The status page reports each store as healthy, degraded or down, compares vector and keyword counts with PostgreSQL, and lists jobs that need reconciliation.",
             "Administrators also review lawyer verification applications.",
           ]}

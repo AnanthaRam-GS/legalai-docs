@@ -108,8 +108,9 @@ export default function MethodologyPage() {
           <p>
             <strong>Crime statistics</strong> come from the National Crime Records Bureau&rsquo;s{" "}
             <cite>Crime in India 2024</cite>, Volume I, Table 1A.4, downloaded from ncrb.gov.in and
-            pinned by SHA-256. The <strong>IPC-to-BNS mapping</strong> (370 rows) is built from
-            NCRB&rsquo;s CYTRAIN correspondence table and BNS text.
+            pinned by SHA-256. The <strong>IPC-to-BNS mapping</strong> (438 rows) combines 370 rows
+            from NCRB&rsquo;s CYTRAIN correspondence table and BNS text with 68 correspondences
+            printed in the NCRB table itself, each attributed to its source and page.
           </p>
         </Section>
 
@@ -179,15 +180,26 @@ export default function MethodologyPage() {
               legal answer from general knowledge.
             </li>
             <li>
-              <strong>Prompt versioning.</strong> Prompts are versioned files (v1 is the frozen
-              evaluation baseline, v2 is in production) pinned by SHA-256, and every hash change is
-              recorded, so evaluation outputs stay attributable to the exact prompt that produced
-              them.
+              <strong>Prompt versioning.</strong> Prompts are versioned files pinned by SHA-256 (v1
+              is the frozen evaluation baseline; v2 added no-coverage answers; v3, in production,
+              adds length and shape rules so professional answers and briefs fit the model&rsquo;s
+              output limit). Every hash change is recorded, so evaluation outputs stay attributable
+              to the exact prompt that produced them.
             </li>
             <li>
-              <strong>Provider chain.</strong> Groq is the primary provider and Gemini the fallback,
-              tried only on provider failures such as timeouts or 5xx errors, never because of
+              <strong>Provider routing.</strong> Answers come from Groq, routed by mode:
+              professional answers and briefs use gpt-oss-120b only, and public answers use
+              gpt-oss-20b, falling back at once to gpt-oss-120b (a second model with its own limits)
+              when 20b is at capacity or fails as a provider. A fallback is never tried because of
               answer content.
+            </li>
+            <li>
+              <strong>Pacing and daily capacity.</strong> The backend paces requests to each
+              model&rsquo;s per-minute token limit with a first-in, first-out queue (at most 90 s,
+              or 45 s for a professional answer waiting for 120b), and tracks each model&rsquo;s
+              tokens over a rolling 24 hours. Past those limits the user gets a clear
+              &ldquo;busy&rdquo; or &ldquo;daily capacity&rdquo; answer with a retry time instead of
+              a provider error.
             </li>
           </ul>
         </Section>
@@ -228,6 +240,9 @@ export default function MethodologyPage() {
         </Section>
 
         <Section id="evaluation" number={7} title="Evaluation methodology">
+          <p>
+            <strong>Retrieval.</strong>
+          </p>
           <Steps
             items={[
               "A frozen benchmark of 30 queries across five types: statute-explicit, plain-language, procedural relief, IPC/BNS transition, and hard or ambiguous.",
@@ -238,14 +253,24 @@ export default function MethodologyPage() {
             ]}
           />
           <p>
+            <strong>Answers.</strong> A frozen set of 30 answer-evaluation queries (15 public, 15
+            professional, including 4 out of scope) is answered under three configurations: LLM
+            only, dense-only RAG and the full pipeline. Each answer is scored automatically for
+            schema validity, structural grounding (citations that point at supplied evidence with
+            matching metadata), unsupported references and no-coverage behaviour, and a blinded
+            sample of 15 queries × 3 configurations goes to human review, with configurations shown
+            as X, Y and Z.
+          </p>
+          <p>
             Model choices were made the same way. Deterministic NER was kept after two pretrained
             candidates failed to improve F1 on a 36-example gold set, and section ranking uses the
             BGE cross-encoder, which scored best on 36 human-reviewed queries.
           </p>
           <Callout kind="warning" title="Known limits of the evaluation">
             One reviewer, 30 queries, pooled rather than exhaustive relevance, a 70-judgment corpus,
-            and very small transition-law subsets. This is retrieval evaluation, not answer
-            evaluation. Expanding towards about 100 queries is planned.
+            and very small transition-law subsets. Answer grounding is structural until the human
+            review is done. Expanding the retrieval benchmark by about 70 queries with a labelling
+            kit that applies the frozen pooling rules is in progress.
           </Callout>
         </Section>
 
@@ -272,7 +297,7 @@ export default function MethodologyPage() {
             </li>
             <li>
               <strong>Pull requests.</strong> Work lands on main through feature branches and
-              reviewed pull requests (67 so far).
+              reviewed pull requests (78 so far).
             </li>
             <li>
               <strong>Continuous integration.</strong> GitHub Actions runs the backend, database,

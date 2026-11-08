@@ -38,7 +38,7 @@ const LAYERS: { name: string; icon: LucideIcon; items: Tech[] }[] = [
     name: "Backend",
     icon: Server,
     items: [
-      { name: "FastAPI 0.115", detail: "Single process, six routers" },
+      { name: "FastAPI 0.133", detail: "Single process, six routers" },
       { name: "SQLAlchemy + Alembic", detail: "ORM and migrations" },
       { name: "Pydantic", detail: "Request, response and settings models" },
       { name: "PyJWT + bcrypt", detail: "HttpOnly-cookie sessions, hashed passwords" },
@@ -52,8 +52,11 @@ const LAYERS: { name: string; icon: LucideIcon; items: Tech[] }[] = [
       { name: "BAAI/bge-m3", detail: "1024-d dense embeddings (FlagEmbedding)" },
       { name: "BM25", detail: "Project-built keyword index, k1 1.5, b 0.75" },
       { name: "BAAI/bge-reranker-v2-m3", detail: "Cross-encoder reranker, fp16 on Apple MPS" },
-      { name: "Groq · openai/gpt-oss-120b", detail: "Primary answer model" },
-      { name: "Google Gemini Flash", detail: "Fallback answer model" },
+      { name: "Groq · openai/gpt-oss-120b", detail: "Professional answers and PDF briefs" },
+      {
+        name: "Groq · openai/gpt-oss-20b",
+        detail: "Public answers (120b when 20b is at capacity)",
+      },
       { name: "PyMuPDF + Tesseract 5", detail: "PDF text and OCR" },
     ],
   },
@@ -85,16 +88,17 @@ interface Deviation {
   planned: string;
   implemented: string;
   reason: ReactNode;
-  status: Status | "as-planned" | "no-record";
+  status: Status | "as-planned" | "no-record" | "not-adopted";
 }
 
 const DEVIATIONS: Deviation[] = [
   {
-    component: "Primary LLM",
+    component: "Answer LLM",
     planned: "Google Gemini Flash",
-    implemented: "Groq (openai/gpt-oss-120b) primary, Gemini fallback",
+    implemented:
+      "Groq, routed by mode: openai/gpt-oss-120b for professional answers, openai/gpt-oss-20b for public answers",
     reason:
-      "In live runs Gemini returned HTTP 503 or timed out on every call. Recorded as a temporary owner decision, to be reverted when Gemini is reliable.",
+      "Gemini returned HTTP 503 or 429, or timed out, on every live attempt between 19 and 30 October 2026. NVIDIA's hosted DeepSeek and gpt-oss-20b listed the models but never returned a token, and a local Ollama model cited no evidence validly. Groq is a recorded owner decision, to be revisited if Gemini becomes reliable.",
     status: "in-progress",
   },
   {
@@ -116,10 +120,10 @@ const DEVIATIONS: Deviation[] = [
   {
     component: "Local development LLM",
     planned: "Ollama + Mistral 7B",
-    implemented: "Not used: the adapter is a deliberate stub",
+    implemented: "Supported through an OpenAI-compatible profile, but not configured",
     reason:
-      "Any provider other than Groq or Gemini returns a controlled 503. Development and tests use mocked adapters instead.",
-    status: "no-record",
+      "An OpenAI-compatible Ollama profile exists and was tried in the October 2026 provider bake-off (gemma4 12B): schema-valid on 4 of 5 cases but with no valid citation and 1–4.5 minutes per answer, so it is not configured. Development and tests use mocked adapters.",
+    status: "not-adopted",
   },
   {
     component: "Chunk size",
@@ -178,7 +182,7 @@ export default function TechStackPage() {
             ))}
           </div>
           <p className="mt-4 text-xs text-subtle">
-            Versions as pinned in the LegalAI repository at commit ed3cc76: frontend/package.json
+            Versions as pinned in the LegalAI repository at commit 2fb2f7c: frontend/package.json
             and requirements.txt.
           </p>
         </section>
@@ -225,6 +229,8 @@ export default function TechStackPage() {
                         <StatusBadge status="in-progress" label="Temporary" />
                       ) : row.status === "no-record" ? (
                         <StatusBadge status="planned" label="No decision record" />
+                      ) : row.status === "not-adopted" ? (
+                        <StatusBadge status="historical" label="Not adopted" />
                       ) : row.status === "completed" ? (
                         <StatusBadge status="completed" label="Adopted" />
                       ) : (

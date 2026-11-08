@@ -1,68 +1,58 @@
 <Callout kind="info" title="Summary only">
   This page summarises local setup so you know what is involved. The [LegalAI
-  repository](https://github.com/AnanthaRam-GS/lexintelAI) has the full, current instructions;
-  follow those when they differ.
+  repository](https://github.com/AnanthaRam-GS/lexintelAI)'s README has the full, current
+  instructions and commands; follow those when they differ.
 </Callout>
 
 ## Prerequisites
 
-| Component             | Purpose                                   | Notes                                                                 |
-| --------------------- | ----------------------------------------- | --------------------------------------------------------------------- |
-| Python 3 with `venv`  | Backend, retrieval and evaluation scripts | Dependencies are listed in `requirements.txt`                         |
-| PostgreSQL            | Canonical database                        | A separate `_test` database is needed for the database-backed tests   |
-| Node.js and npm       | Next.js frontend                          | Dependencies are pinned in `frontend/package.json`                    |
-| Tesseract OCR         | Scanned PDFs (optional)                   | Without it, text PDFs work and scanned pages return `OCR_UNAVAILABLE` |
-| An LLM provider key   | Answer generation                         | Groq is the primary provider and Gemini the fallback                  |
-| Disk space for models | BGE-M3 and the BGE reranker               | Downloaded through Hugging Face on first use                          |
+| Component       | Version tested       | Notes                                                                           |
+| --------------- | -------------------- | ------------------------------------------------------------------------------- |
+| Python          | 3.14                 | Dependencies in `requirements.txt`, every version pinned in `requirements.lock` |
+| Node.js and npm | Node 22              | Frontend dependencies pinned in `frontend/package.json`                         |
+| PostgreSQL      | 18                   | A separate `_test` database is needed for the database-backed tests             |
+| Tesseract OCR   | 5, with English data | Only for scanned PDFs; without it, scanned pages return `OCR_UNAVAILABLE`       |
+| Disk            | 7 GB or more free    | BGE-M3 (4.3 GB) and the BGE reranker (2.2 GB) in the Hugging Face cache         |
+| A Groq API key  | —                    | Groq serves every answer                                                        |
 
-LegalAI was developed and profiled on Apple silicon, where the query models run on the GPU (MPS). Other machines fall back to CPU automatically, with slower reranking.
+LegalAI is developed on macOS on Apple silicon, where the query models run on the GPU (MPS). Linux works on CPU, with slower reranking; continuous integration runs on Ubuntu.
 
 ## Set up the backend
 
-1. Create a virtual environment and install the dependencies:
+1. Create a virtual environment and install the pinned dependencies (`pip install -r requirements.txt -c requirements.lock`).
+2. Copy `.env.example` to `.env` and fill in the values marked as required. Never commit `.env`. They include:
 
-   ```bash
-   python3 -m venv .venv
-   .venv/bin/pip install -r requirements.txt
-   ```
-
-2. Copy `.env.example` to `.env` and fill in the values. Never commit `.env`. The settings you must provide include:
-
+   - `APP_ENV`: `development` locally. It has no default; the backend refuses to start when it is unset or unknown;
    - `DATABASE_URL`: the PostgreSQL connection string;
-   - `JWT_SECRET_KEY`: at least 32 bytes; the backend refuses to start with a missing, short or default secret;
-   - `LEGALAI_LLM_PROVIDER` and `LEGALAI_LLM_FALLBACK_PROVIDER`, with the matching `GROQ_*` and `GEMINI_*` settings;
-   - `FRONTEND_ORIGIN`: the frontend's URL, used for CORS and the CSRF origin check.
+   - `JWT_SECRET_KEY`: at least 32 bytes; the backend refuses a missing, short or default secret;
+   - `SEED_LAWYER_PASSWORD` and `SEED_ADMIN_PASSWORD`: for the two development accounts;
+   - `GROQ_API_KEY`: for real answers. The model routing (`GROQ_MODEL`, `GROQ_PUBLIC_MODEL` and the backup models), prompt v3 and the pacing limits are already set in `.env.example`.
 
-3. Apply the database migrations with Alembic:
+3. Create the database and apply the migrations with Alembic, then seed the development accounts (`lawyer@legalai.local` and `admin@legalai.local`; the seeding refuses to run in production).
+4. Load the structured data from the committed CSVs: the IPC-BNS mapping and the NCRB statistics.
+5. Get the judgment corpus. The judgment text is not in Git: team members copy the chunk files from the team's shared folder, and anyone else rebuilds them from the Indian Kanoon API with their own token, under its API terms.
+6. Download the two models, produce the analytics data (cited sections and outcomes, marked unreviewed), and build the indexes with one command. The build creates Chroma and BM25, adds the index metadata and ends with the store-consistency check; it takes 15 to 40 minutes on CPU.
+7. Start the API on `127.0.0.1:8000` with uvicorn. `GET /health` answers at once and reports the database, the stores, the model warm-up, the answer-model queue and the day's model usage.
 
-   ```bash
-   .venv/bin/alembic upgrade head
-   ```
-
-4. Start the API:
-
-   ```bash
-   .venv/bin/uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
-   ```
-
-   `GET /health` answers immediately and reports `models.status` as `loading` until the embedding and reranking models finish warming up.
-
-The trusted corpus, its indexes and the structured datasets are built with scripts under `backend/scripts/`. Each data-changing script supports `--dry-run` and refuses the development database without an explicit confirmation flag.
+The data scripts take the database through `--database-url-env` and refuse to write to the development database without an explicit `--confirm-dev`.
 
 ## Set up the frontend
 
 ```bash
 cd frontend
-npm install
-NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000 npm run dev
+npm ci
+cp .env.example .env.local    # NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+npm run dev                   # http://localhost:3000
 ```
 
-Public Mode works without an account. Professional Mode needs a lawyer account and Admin needs an administrator account; development accounts are created with a seeding script whose passwords come only from environment variables.
+Use the same host name for the frontend and the API (both `localhost`): the sign-in cookie is `SameSite=Lax`, so mixing `localhost` and `127.0.0.1` signs you in and then bounces you back to the sign-in page.
+
+Public Mode works without an account. Professional Mode needs a lawyer account and Admin an administrator account; the seeded accounts sign in at `/login`.
 
 ## Check that it works
 
-- `GET /health` returns `ok` with the database reachable, plus model and OCR status.
-- `backend/scripts/run_integration_smoke.py` checks the route surface before user testing.
+- `GET /health` returns `ok` with the database reachable, plus model, OCR, queue and daily-usage status.
+- `backend/scripts/verify_analytics.py` compares the analytics endpoints with the database.
 - `backend/scripts/verify_store_consistency.py` confirms PostgreSQL, Chroma and BM25 agree.
 
 See [Testing and QA](/docs/testing/) for the test suites.

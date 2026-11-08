@@ -40,7 +40,7 @@ const LAYERS: Layer[] = [
   {
     id: "ai",
     name: "AI / RAG",
-    tech: "BGE-M3 · BM25 · RRF · BGE reranker · Groq / Gemini · Tesseract",
+    tech: "BGE-M3 · BM25 · RRF · BGE reranker · Groq gpt-oss · Tesseract",
     icon: Brain,
     responsibilities: [
       "Deterministic query understanding: statutes, sections and legal regime (IPC/CrPC or BNS/BNSS).",

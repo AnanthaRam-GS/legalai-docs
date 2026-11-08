@@ -81,8 +81,8 @@ const GROUPS: { title: string; tables: Table[] }[] = [
     tables: [
       {
         name: "ipc_bns_mapping",
-        columns: ["ipc_section, bns_section", "descriptions", "change_type"],
-        note: "370 rows, unreviewed.",
+        columns: ["ipc_section, bns_section", "descriptions", "change_type", "source, source_page"],
+        note: "438 rows (370 CYTRAIN, 68 NCRB), unreviewed.",
       },
       {
         name: "ncrb_stats",

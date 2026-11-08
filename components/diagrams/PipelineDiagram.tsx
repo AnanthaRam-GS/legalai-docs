@@ -54,9 +54,9 @@ const STAGES: Stage[] = [
   {
     id: "generate",
     title: "LLM generation",
-    subtitle: "structured JSON, prompt v2",
+    subtitle: "structured JSON, prompt v3",
     detail:
-      "The answer model returns schema-checked JSON in which every substantive statement is a claim citing evidence IDs. Groq (gpt-oss-120b) is primary; Gemini is tried only if the primary fails as a provider.",
+      "The answer model returns schema-checked JSON in which every substantive statement is a claim citing evidence IDs. Requests wait in a paced queue for Groq: gpt-oss-120b for professional answers, gpt-oss-20b for public ones (falling back to 120b).",
   },
   {
     id: "validate",

@@ -6,7 +6,7 @@ LegalAI handles legal questions and private documents, so it limits what it stor
 - **Lawyer access** is granted only when an administrator approves an application with bar council credentials and a proof document.
 - **Sessions** are JWTs in an `HttpOnly` cookie with an explicit `SameSite` setting, marked `Secure` in production. Page scripts cannot read the token.
 - **Every request** reloads the user from the database, so a deactivated account is blocked immediately and the role in the token is never trusted.
-- **Startup checks** refuse to run with a missing, short (under 32 bytes) or known default JWT secret, and refuse production if any account still has a historical development password.
+- **Startup checks** refuse to run with a missing, short (under 32 bytes) or known default JWT secret, refuse production if any account still has a historical development password, refuse an unset or unknown `APP_ENV`, and refuse console email delivery in production (verification codes would go to the log). The backend binds to `127.0.0.1` by default; a deployment opts in to outside connections explicitly.
 
 ## Sign-in protection
 
@@ -51,7 +51,7 @@ Two layers protect cookie-authenticated writes:
 
 - **No token revocation:** logout clears the cookie, but a copied token stays valid until it expires (60 minutes). Deactivation still blocks it immediately.
 - **In-memory limits:** rate limits and the generation cap are per process and reset on restart; scaling out needs a shared store.
-- **Dependencies:** a dependency scan fixed every critical and high finding with a non-breaking upgrade. Remaining findings are recorded with their exposure: some need a FastAPI upgrade, and the Chroma advisories affect its server mode, which LegalAI does not run.
+- **Dependencies:** dependency scans fixed every critical and high finding on a request path, including upgrades to FastAPI 0.133 with Starlette 1.3.1, Next.js 16.4.1 and PyJWT 2.15.0. The remaining 14 Python advisories in 8 packages are recorded with their exposure, none on a request path: the Chroma advisories affect its server mode, which LegalAI does not run, and a filelock finding is in a component LegalAI never uses (risk accepted). npm reports 2 moderate findings in the test runner only.
 
 </Callout>
 

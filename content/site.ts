@@ -84,9 +84,9 @@ export const site = {
   /** YouTube or Google Drive link. Leave empty to show the "coming soon" state. */
   demoVideoUrl: "",
   /** ISO date of the last content review. */
-  lastUpdated: "2026-10-25",
+  lastUpdated: "2026-11-08",
   /** Commit of the LegalAI main branch that the facts on this site describe. */
-  sourceCommit: "ed3cc76",
+  sourceCommit: "2fb2f7c",
 } as const;
 
 export const guide: Person = {
@@ -213,21 +213,21 @@ export const stats: Stat[] = [
   {
     id: "backend-tests",
     label: "Backend test cases",
-    value: 951,
-    detail: "across 81 Python test modules",
+    value: 1126,
+    detail: "across 94 Python test modules",
     sample: "Test methods defined on main (static count, not a pass count)",
-    asOf: "2026-10-25",
-    source: "backend/scripts/tests/test_*.py on main @ ed3cc76",
+    asOf: "2026-11-08",
+    source: "backend/scripts/tests/test_*.py on main @ 2fb2f7c",
     status: "completed",
   },
   {
     id: "frontend-tests",
     label: "Frontend test cases",
-    value: 291,
-    detail: "across 40 Vitest files",
+    value: 300,
+    detail: "across 41 Vitest files",
     sample: "Test cases defined on main (static count, not a pass count)",
-    asOf: "2026-10-25",
-    source: "frontend/**/*.test.ts(x) on main @ ed3cc76",
+    asOf: "2026-11-08",
+    source: "frontend/**/*.test.ts(x) on main @ 2fb2f7c",
     status: "completed",
   },
   {
@@ -323,16 +323,31 @@ export const phases: Phase[] = [
     items: [
       {
         label: "Retrieval evaluation",
+        status: "completed",
+        note: "30-query benchmark, re-run in October 2026 with matching results.",
+      },
+      {
+        label: "Three-configuration answer evaluation (LLM only, dense RAG, full pipeline)",
+        status: "completed",
+        note: "30 queries re-run in October 2026; the human review of a 15-query sample is pending.",
+      },
+      {
+        label: "Benchmark expansion by about 70 queries",
         status: "in-progress",
-        note: "30-query benchmark done; expansion towards about 100 queries is planned.",
+        note: "A labelling kit with the frozen pooling rules is ready; queries and labels are being collected.",
       },
       { label: "AI performance profiling", status: "completed" },
       { label: "Backend hardening and unified error contract", status: "completed" },
       { label: "Frontend error states", status: "completed" },
       {
         label: "Live professional query runs",
-        status: "blocked",
-        note: "Blocked by LLM provider capacity: the professional answer does not fit the current token limits.",
+        status: "completed",
+        note: "Unblocked by prompt v3 and Groq per-mode routing; professional answers use gpt-oss-120b only.",
+      },
+      {
+        label: "Rate-limit resilience and daily capacity",
+        status: "completed",
+        note: "A paced queue per model, clear busy messages, and a rolling 24-hour token budget.",
       },
       { label: "Continuous integration and end-to-end tests", status: "completed" },
       { label: "Deployment", status: "planned" },
@@ -359,7 +374,7 @@ export const reviewChecklist: PhaseItem[] = [
   {
     label: "/query/professional returning sections, citations and a structured case brief",
     status: "completed",
-    note: "Covered by tests; live runs are blocked by provider capacity.",
+    note: "Covered by tests and run live since prompt v3 (October 2026).",
   },
   { label: "/query/public returning plain-language responses", status: "completed" },
   {
@@ -518,14 +533,62 @@ export const milestones: Milestone[] = [
     refs: "PR #67",
     status: "completed",
   },
+  {
+    date: "2026-10-26",
+    title: "Serialised model inference",
+    description:
+      "One lock around every model load and inference ended a crash under concurrent queries on Apple MPS (0 crashes in 225 stress-test requests); a duplicate corpus upload now gets a plain message.",
+    refs: "PR #68",
+    status: "completed",
+  },
+  {
+    date: "2026-10-26",
+    title: "Source-attributed IPC-BNS mapping",
+    description:
+      "Every pair printed in the NCRB table was cross-checked against the mapping, and the 68 missing correspondences were added with their source and page.",
+    refs: "PRs #69, #70",
+    status: "completed",
+  },
+  {
+    date: "2026-10-27",
+    title: "Reproducible setup and safe defaults",
+    description:
+      "A README tested from a clean checkout, one index-build command, self-hosted fonts, security upgrades (FastAPI, Starlette, Next.js, PyJWT) and safe configuration defaults.",
+    refs: "PRs #71, #72",
+    status: "completed",
+  },
+  {
+    date: "2026-10-30",
+    title: "Provider bake-off, prompt v3 and Groq routing",
+    description:
+      "Groq, Gemini, NVIDIA and a local Ollama model were compared on the same cases. Prompt v3 made professional answers and briefs fit Groq's limits, with gpt-oss-120b for professional and gpt-oss-20b for public answers.",
+    refs: "PRs #73, #74",
+    status: "completed",
+  },
+  {
+    date: "2026-10-30",
+    title: "Rate-limit resilience",
+    description:
+      "A paced first-in, first-out queue per answer model, retry times honoured, and a 'queued' notice in the interface; a sustained check answered 8 of 8 queries.",
+    refs: "PR #75",
+    status: "completed",
+  },
+  {
+    date: "2026-11-02",
+    title: "October 2026 evaluation",
+    description:
+      "Retrieval re-run and the three-configuration answer evaluation on 30 queries; professional answers wait for gpt-oss-120b, and daily usage is tracked over a rolling 24 hours.",
+    refs: "PRs #76–#78",
+    status: "completed",
+  },
 ];
 
 export const roadmap: RoadmapItem[] = [
   {
-    title: "Live professional answers",
+    title: "Human review of the October 2026 evaluation",
     description:
-      "Unblock professional and PDF-brief runs: a higher provider tier, a working Gemini fallback, or a shorter professional output schema.",
-    status: "blocked",
+      "Reviewers judge a blinded sample of 15 queries × 3 configurations for legal correctness and whether each cited authority supports its claim.",
+    status: "planned",
   },
   {
     title: "InLegalBERT and LlamaIndex scope decision",
@@ -534,20 +597,21 @@ export const roadmap: RoadmapItem[] = [
     status: "pending-approval",
   },
   {
-    title: "Evaluation expansion",
+    title: "Benchmark expansion",
     description:
-      "Grow the retrieval benchmark from 30 towards about 100 queries and compare LLM-only, semantic-only and full-pipeline configurations.",
-    status: "planned",
+      "Add about 70 retrieval queries with human labels, using the labelling kit and the frozen pooling rules, then recompute the retrieval metrics.",
+    status: "in-progress",
   },
   {
-    title: "Serialise model inference on Apple MPS",
+    title: "Check case names in answer text",
     description:
-      "When start-up warm-up overlapped the first request, the backend crashed in the embedding model on MPS. Inference on one MPS model is not yet serialised, so the end-to-end real mode runs with warm-up off until this is fixed.",
+      "Detect case names written in an answer's text that match no retrieved evidence, so they are flagged like unsupported citations.",
     status: "planned",
   },
   {
     title: "Deployment",
-    description: "Deploy the backend, frontend and persistent stores.",
+    description:
+      "Deploy the backend, frontend and persistent stores, within the answer provider's daily capacity.",
     status: "planned",
   },
   {

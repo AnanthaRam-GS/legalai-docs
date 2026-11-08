@@ -2,13 +2,13 @@ LegalAI is tested at four levels: fast unit and contract tests, database-backed 
 
 ## Test suites at a glance
 
-| Suite               | Runner                     | Size on `main` (25 October 2026)                           |
-| ------------------- | -------------------------- | ---------------------------------------------------------- |
-| Backend tests       | Python `unittest`          | 951 test methods in 81 modules, 12 of them database-backed |
-| Frontend tests      | Vitest and Testing Library | 291 test cases in 40 files                                 |
-| End-to-end journeys | Playwright (Chromium)      | 15 tests in 6 spec files                                   |
+| Suite               | Runner                     | Size on `main` (8 November 2026)                             |
+| ------------------- | -------------------------- | ------------------------------------------------------------ |
+| Backend tests       | Python `unittest`          | 1,126 test methods in 94 modules, 13 of them database-backed |
+| Frontend tests      | Vitest and Testing Library | 300 test cases in 41 files                                   |
+| End-to-end journeys | Playwright (Chromium)      | 15 tests in 6 spec files                                     |
 
-These are counts of tests defined in the code at commit `ed3cc76`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+These are counts of tests defined in the code at commit `2fb2f7c`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
 
 ## Continuous integration
 
@@ -17,7 +17,7 @@ GitHub Actions runs four jobs on every pull request and every push to `main`. No
 | Job            | What it runs                                                                           |
 | -------------- | -------------------------------------------------------------------------------------- |
 | `backend-unit` | The non-database suites, with Tesseract installed; fails if the OCR tests were skipped |
-| `backend-db`   | The 12 database-backed modules against a throwaway PostgreSQL service                  |
+| `backend-db`   | The 13 database-backed modules against a throwaway PostgreSQL service                  |
 | `frontend`     | ESLint, Prettier, the TypeScript check, Vitest and a production build                  |
 | `e2e`          | The Playwright journeys against the real backend and frontend in fake mode             |
 
@@ -46,6 +46,8 @@ Every test starts from truncated tables. This setup exists because earlier test 
 - **Error contract:** a test calls every registered route in every way it can fail and checks that each error has the `{error, code, detail}` shape.
 - **Negative authorization:** a database suite checks that each role is refused the routes it may not use.
 - **Model devices:** rankings on all 30 benchmark queries must be identical on CPU and Apple MPS; a slow mocked PDF query must not block `/health`.
+- **Model concurrency:** every model load and inference holds one process-wide lock, because two inferences at once crashed the backend on Apple MPS. A local stress run (5 repetitions of 10 simultaneous queries during start-up, 3 more rounds of 10 and 5 sequential ones) gave 0 crashes and 225 of 225 successful responses; before the fix the same load crashed every time.
+- **Pacing and daily capacity:** mocked tests check the answer-model queue, the per-mode fallback rules, the rolling 24-hour token budget across restarts, and the busy and daily-capacity responses.
 - **OCR:** fixture scans must reach at least 95% character accuracy; tests skip with a reason when Tesseract is missing.
 - **NCRB extraction:** the extractor's output must be byte-for-byte reproducible from the recorded PDF.
 
@@ -57,13 +59,13 @@ Every test starts from truncated tables. This setup exists because earlier test 
 4. **Rehearse** the change on the rehearsal database and store copies: dry run, run, second run (which must make 0 changes).
 5. **Run on development** the same way, then confirm the analytics verifier reports `RECONCILED` and the store verifier reports `CONSISTENT`.
 
-## Supervised live runs
+## Supervised live runs and answer evaluation
 
-Live runs send real questions through the full pipeline with a live answer model, record identifiers, timings and pass/fail checks in the repository, and keep full responses outside it for legal review. Each run checks that sources are validated citations only, that excerpts and evidence references resolve to real chunks, and that no stack trace reaches the user.
+Live runs send real questions through the full pipeline with a live answer model, record identifiers, timings and pass/fail checks in the repository, and keep full responses outside it for legal review. Each run checks that sources are validated citations only, that excerpts and evidence references resolve to real chunks, and that no stack trace reaches the user. The October 2026 [answer evaluation](/results/#evaluation-2026-10) ran 30 queries through three configurations the same way, within an approved budget of provider calls.
 
 ## Not yet in place
 
 - **User acceptance testing** with law students or practitioners and with non-technical users <StatusBadge status="planned" />
-- **Live professional runs**, blocked by provider capacity <StatusBadge status="blocked" />
+- **Human review** of the October 2026 answer evaluation <StatusBadge status="planned" label="Pending" />
 
 Source: `docs/TESTING.md`, `docs/OCR.md`, `docs/performance/PERFORMANCE_BASELINE.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository; test counts from `backend/scripts/tests/` and the frontend test files on `main`.
