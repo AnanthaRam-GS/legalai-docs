@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 export const metadata: Metadata = {
   title: "Methodology",
   description:
-    "How LegalAI acquires data, chunks judgments, retrieves and reranks evidence, generates grounded answers, verifies section labels, builds analytics data, runs OCR, evaluates itself and tests models.",
+    "How LegalAI acquires data, chunks judgments, retrieves and reranks evidence, generates evidence-cited answers, verifies section labels, builds analytics data, runs OCR, evaluates itself and tests models.",
   alternates: { canonical: "/methodology/" },
 };
 
@@ -17,7 +17,7 @@ const sections = [
   { id: "data", label: "Data acquisition" },
   { id: "chunking", label: "Chunking" },
   { id: "retrieval", label: "Retrieval and reranking" },
-  { id: "generation", label: "Grounded generation" },
+  { id: "generation", label: "Evidence-cited generation" },
   { id: "section-labels", label: "Section labels" },
   { id: "analytics", label: "Analytics data" },
   { id: "ocr", label: "OCR" },
@@ -161,7 +161,7 @@ export default function MethodologyPage() {
           </p>
         </Section>
 
-        <Section id="generation" number={4} title="Grounded generation">
+        <Section id="generation" number={4} title="Evidence-cited generation">
           <ul className="list-disc space-y-2 pl-5">
             <li>
               <strong>Evidence IDs.</strong> Retrieved passages are labelled E1…E5; excerpts from a
@@ -309,9 +309,12 @@ export default function MethodologyPage() {
             professional, including 4 out of scope) is answered under three configurations: LLM
             only, dense-only RAG and the full pipeline. Each answer is scored automatically for
             schema validity, structural grounding (citations that point at supplied evidence with
-            matching metadata), unsupported references and no-coverage behaviour, and a blinded
-            sample of 15 queries × 3 configurations goes to human review, with configurations shown
-            as X, Y and Z.
+            matching metadata), unsupported references and no-coverage behaviour. A blinded sample
+            of 15 queries × 3 configurations, shown as X, Y and Z, is then reviewed for whether each
+            cited passage supports its claim and whether the answer is legally correct. That review
+            was done in two rounds by an AI chat assistant (not Claude Code) and is not yet verified
+            by a person: round 1 on 600-character excerpts, round 2 on the full passages of the
+            citations round 1 did not call fully supported.
           </p>
           <p>
             Model choices were made the same way: section ranking uses the BGE cross-encoder, which
@@ -320,9 +323,9 @@ export default function MethodologyPage() {
           </p>
           <Callout kind="warning" title="Known limits of the evaluation">
             One reviewer, 30 queries, pooled rather than exhaustive relevance, a 70-judgment corpus,
-            and very small transition-law subsets. Answer grounding is structural until the human
-            review is done. Expanding the retrieval benchmark by about 70 queries with a labelling
-            kit that applies the frozen pooling rules is in progress.
+            and very small transition-law subsets. Reviewed grounding comes from an AI reviewer and
+            still needs a human check. Expanding the retrieval benchmark by about 70 queries with a
+            labelling kit that applies the frozen pooling rules is in progress.
           </Callout>
         </Section>
 
@@ -365,7 +368,7 @@ export default function MethodologyPage() {
             </li>
             <li>
               <strong>Pull requests.</strong> Work lands on main through feature branches and
-              reviewed pull requests (86 so far).
+              reviewed pull requests (90 so far).
             </li>
             <li>
               <strong>Continuous integration.</strong> GitHub Actions runs the backend, database,

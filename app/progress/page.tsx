@@ -150,7 +150,7 @@ export default function ProgressPage() {
           </ul>
           <Callout kind="info" title="Future work: CourtSim">
             The build plan defers a mock-trial simulator with prosecutor, defence and judge agents
-            grounded in the same corpus. It is outside the current scope.
+            drawing on the same corpus. It is outside the current scope.
           </Callout>
         </section>
       </Container>

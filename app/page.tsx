@@ -32,7 +32,7 @@ const modes = [
     icon: Gavel,
     title: "Professional Mode",
     href: "/features/#professional-mode",
-    body: "Verified lawyers get grounded answers with precedents, relative relevance, a cited-in-answer badge, and structured briefs from private PDFs: parties, chronology, procedural stages and evidence.",
+    body: "Verified lawyers get answers whose citations point to retrieved judgments, with precedents, relative relevance, a cited-in-answer badge, and structured briefs from private PDFs: parties, chronology, procedural stages and evidence.",
   },
   {
     icon: BarChart3,
@@ -53,7 +53,7 @@ const pipeline = [
   "Dense + BM25 retrieval",
   "Reciprocal rank fusion",
   "Cross-encoder reranking",
-  "Grounded generation",
+  "Evidence-cited generation",
   "Citation validation",
 ];
 

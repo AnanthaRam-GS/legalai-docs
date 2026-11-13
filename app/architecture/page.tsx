@@ -20,7 +20,7 @@ export default function ArchitecturePage() {
     <>
       <PageHeader
         eyebrow="Architecture"
-        title="Four layers, one grounded pipeline"
+        title="Four layers, one evidence-cited pipeline"
         description="A Next.js frontend talks to a single FastAPI backend, which runs retrieval, generation and analytics over PostgreSQL, a Chroma vector index and a BM25 keyword index."
       />
       <Container className="py-16">

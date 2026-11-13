@@ -89,7 +89,7 @@ export default function OverviewPage() {
     <>
       <PageHeader
         eyebrow="Problem and objectives"
-        title="Grounded legal help for Indian criminal law"
+        title="Evidence-cited legal help for Indian criminal law"
         description="LegalAI is a retrieval-augmented assistant that answers criminal-law questions from a curated corpus of Indian judgments, shows where every claim comes from, and adds analytics over cited sections and official crime statistics."
       />
 

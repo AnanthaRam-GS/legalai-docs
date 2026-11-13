@@ -130,7 +130,7 @@ export default function FeaturesPage() {
           id="professional-mode"
           icon={Gavel}
           eyebrow="Professional Mode"
-          title="Grounded research for verified lawyers"
+          title="Cited research for verified lawyers"
           intro="Lawyer access is granted only after an administrator reviews the applicant's bar credentials."
           reverse
           points={[
