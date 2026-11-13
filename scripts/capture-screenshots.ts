@@ -11,6 +11,10 @@
  *   SHOT_FRONTEND_URL  default http://127.0.0.1:3000
  *   SHOT_PUBLIC_QUESTION  the question used for the live public answer
  *   SHOT_PROFESSIONAL_QUESTION, SHOT_BRIEF_PDF   used only with --professional
+ *   SHOT_BRIEF_NAME    file name for the brief shot (default professional-brief), so a second
+ *                      brief (for example a charge sheet) can be captured without replacing the first
+ *   SHOT_IPC_BNS_SEARCH  optional search term typed into the IPC-BNS tab before its capture; the
+ *                      first row flagged as conflicting with the official heading is scrolled into view
  *   SHOT_RAW_DIR       optional folder (outside the repo) for full-page PNGs of live answers,
  *                      for review and cropping without another LLM call
  *
@@ -206,6 +210,16 @@ async function captureProfessional(browser: Browser): Promise<void> {
       if (!wanted(name)) continue;
       await page.getByRole("button", { name: label, exact: true }).click();
       await settle(page, 1500);
+      const search = process.env.SHOT_IPC_BNS_SEARCH;
+      if (name === "analytics-ipc-bns" && search) {
+        await page.locator("input[type=search]").fill(search);
+        await page.waitForTimeout(600);
+        const flagged = page.locator('[data-testid="mapping-conflict"]').first();
+        if ((await flagged.count()) > 0) {
+          await flagged.evaluate((node) => node.scrollIntoView({ block: "center" }));
+          await page.waitForTimeout(400);
+        }
+      }
       await shoot(page, name);
     }
   }
@@ -251,12 +265,8 @@ async function captureProfessional(browser: Browser): Promise<void> {
     await shoot(page, "professional-answer");
   }
 
-  if (
-    includeProfessional &&
-    allowLive &&
-    wanted("professional-brief") &&
-    process.env.SHOT_BRIEF_PDF
-  ) {
+  const briefName = process.env.SHOT_BRIEF_NAME ?? "professional-brief";
+  if (includeProfessional && allowLive && wanted(briefName) && process.env.SHOT_BRIEF_PDF) {
     // A private query upload: analysed for one request, never added to the corpus.
     await page.goto(`${FRONTEND}/professional/upload`);
     await settle(page);
@@ -266,8 +276,8 @@ async function captureProfessional(browser: Browser): Promise<void> {
       page.getByRole("button", { name: "Begin Private Analysis" }).click(),
     );
     await settle(page, 1500);
-    await saveRaw(page, "professional-brief");
-    await shoot(page, "professional-brief");
+    await saveRaw(page, briefName);
+    await shoot(page, briefName);
   }
 
   await page.close();
