@@ -2,45 +2,49 @@ Terms used across this site, grouped by area. Legal definitions are simplified f
 
 ## Indian criminal law
 
-| Term                         | Meaning                                                                                                                                |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **IPC**                      | Indian Penal Code, 1860: the substantive criminal law defining offences and punishments until it was replaced by the BNS.              |
-| **BNS**                      | Bharatiya Nyaya Sanhita: the code that replaced the IPC from 1 July 2024.                                                              |
-| **CrPC**                     | Code of Criminal Procedure: the procedural code (arrest, bail, investigation, trial, appeal) replaced by the BNSS.                     |
-| **BNSS**                     | Bharatiya Nagarik Suraksha Sanhita: the procedural code that replaced the CrPC from 1 July 2024.                                       |
-| **Legal regime**             | Whether a matter falls under the old codes (IPC/CrPC), the new codes (BNS/BNSS) or both, usually depending on the date of the offence. |
-| **FIR**                      | First Information Report: the police record that starts a criminal case.                                                               |
-| **Charge sheet**             | The police report filed in court at the end of an investigation.                                                                       |
-| **Bail / anticipatory bail** | Release from custody pending trial; anticipatory bail is sought before an expected arrest.                                             |
-| **Quashing**                 | A High Court setting aside criminal proceedings, for example under CrPC 482.                                                           |
-| **Precedent**                | An earlier judgment relied on for its reasoning in a later case.                                                                       |
-| **Offence provision**        | A section that defines an offence (such as IPC 302), as opposed to procedural, evidentiary or definitional sections.                   |
-| **NDPS, POCSO, SC/ST Act**   | Special criminal statutes on narcotics, child sexual offences and atrocities against Scheduled Castes and Tribes.                      |
-| **NCRB**                     | National Crime Records Bureau, which publishes the annual _Crime in India_ statistics.                                                 |
+| Term                         | Meaning                                                                                                                                            |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **IPC**                      | Indian Penal Code, 1860: the substantive criminal law defining offences and punishments until it was replaced by the BNS.                          |
+| **BNS**                      | Bharatiya Nyaya Sanhita: the code that replaced the IPC from 1 July 2024.                                                                          |
+| **CrPC**                     | Code of Criminal Procedure: the procedural code (arrest, bail, investigation, trial, appeal) replaced by the BNSS.                                 |
+| **BNSS**                     | Bharatiya Nagarik Suraksha Sanhita: the procedural code that replaced the CrPC from 1 July 2024.                                                   |
+| **BSA**                      | Bharatiya Sakshya Adhiniyam: the law of evidence that replaced the Indian Evidence Act from 1 July 2024.                                           |
+| **India Code**               | The Government of India's official repository of central Acts (indiacode.gov.in), the source of LegalAI's official section headings.               |
+| **Official heading**         | A section's marginal note as printed in the Act, such as "Punishment for murder"; LegalAI's first source for section titles.                       |
+| **Section label**            | The title shown next to a section number. LegalAI resolves it against trusted sources and marks it verified, corrected, unverified or in conflict. |
+| **Legal regime**             | Whether a matter falls under the old codes (IPC/CrPC), the new codes (BNS/BNSS) or both, usually depending on the date of the offence.             |
+| **FIR**                      | First Information Report: the police record that starts a criminal case.                                                                           |
+| **Charge sheet**             | The police report filed in court at the end of an investigation.                                                                                   |
+| **Bail / anticipatory bail** | Release from custody pending trial; anticipatory bail is sought before an expected arrest.                                                         |
+| **Quashing**                 | A High Court setting aside criminal proceedings, for example under CrPC 482.                                                                       |
+| **Precedent**                | An earlier judgment relied on for its reasoning in a later case.                                                                                   |
+| **Offence provision**        | A section that defines an offence (such as IPC 302), as opposed to procedural, evidentiary or definitional sections.                               |
+| **NDPS, POCSO, SC/ST Act**   | Special criminal statutes on narcotics, child sexual offences and atrocities against Scheduled Castes and Tribes.                                  |
+| **NCRB**                     | National Crime Records Bureau, which publishes the annual _Crime in India_ statistics.                                                             |
 
 ## Retrieval and AI
 
-| Term                         | Meaning                                                                                                                           |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **RAG**                      | Retrieval-augmented generation: retrieve relevant passages first, then have a language model answer only from them.               |
-| **LLM**                      | Large language model; LegalAI uses one only for the final, evidence-bound answer.                                                 |
-| **Chunk**                    | A passage of a judgment (a run of paragraphs) that is indexed and retrieved as a unit.                                            |
-| **Embedding**                | A vector representing a passage's meaning, so similar passages are close together.                                                |
-| **BGE-M3**                   | The multilingual embedding model LegalAI uses for dense retrieval (1024 dimensions).                                              |
-| **Dense retrieval**          | Finding passages whose embeddings are closest to the query's embedding.                                                           |
-| **Vector store / Chroma**    | The database holding the chunk embeddings for dense retrieval.                                                                    |
-| **BM25**                     | A keyword-ranking formula that rewards rare terms, good at exact section numbers and legal terms.                                 |
-| **Hybrid retrieval**         | Running dense and BM25 retrieval together, because they find different relevant passages.                                         |
-| **RRF**                      | Reciprocal rank fusion: merges ranked lists by summing 1 / (k + rank); LegalAI uses k = 60.                                       |
-| **Reranker / cross-encoder** | A model that reads the query and a passage together and scores how well they match; slower but more precise than retrieval alone. |
-| **Evidence ID**              | A label (E1, E2…) given to each retrieved passage so the answer can cite it; P# labels mark excerpts from a private upload.       |
-| **Citation validation**      | Checking that each citation in an answer points to evidence that was actually supplied, with matching metadata.                   |
-| **No-coverage answer**       | The explicit reply given when nothing relevant was retrieved, instead of a general-knowledge answer.                              |
-| **Relative relevance**       | Reranker scores rescaled within one answer so the top precedent is 1.0; a ranking, not a probability.                             |
-| **Hallucination**            | A fluent model output that is not supported by any source, such as an invented case.                                              |
-| **NER**                      | Named-entity recognition: finding statutes, sections, courts and other entities in text.                                          |
-| **InLegalBERT**              | A language model pre-trained on Indian legal text, evaluated for NER but not adopted.                                             |
-| **OCR / Tesseract**          | Optical character recognition, reading text from scanned page images; Tesseract is the engine used.                               |
+| Term                         | Meaning                                                                                                                                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **RAG**                      | Retrieval-augmented generation: retrieve relevant passages first, then have a language model answer only from them.                                                                            |
+| **LLM**                      | Large language model; LegalAI uses one only for the final, evidence-bound answer.                                                                                                              |
+| **Chunk**                    | A passage of a judgment (a run of paragraphs) that is indexed and retrieved as a unit.                                                                                                         |
+| **Embedding**                | A vector representing a passage's meaning, so similar passages are close together.                                                                                                             |
+| **BGE-M3**                   | The multilingual embedding model LegalAI uses for dense retrieval (1024 dimensions).                                                                                                           |
+| **Dense retrieval**          | Finding passages whose embeddings are closest to the query's embedding.                                                                                                                        |
+| **Vector store / Chroma**    | The database holding the chunk embeddings for dense retrieval.                                                                                                                                 |
+| **BM25**                     | A keyword-ranking formula that rewards rare terms, good at exact section numbers and legal terms.                                                                                              |
+| **Hybrid retrieval**         | Running dense and BM25 retrieval together, because they find different relevant passages.                                                                                                      |
+| **RRF**                      | Reciprocal rank fusion: merges ranked lists by summing 1 / (k + rank); LegalAI uses k = 60.                                                                                                    |
+| **Reranker / cross-encoder** | A model that reads the query and a passage together and scores how well they match; slower but more precise than retrieval alone.                                                              |
+| **Evidence ID**              | A label (E1, E2…) given to each retrieved passage so the answer can cite it; P# labels mark excerpts from a private upload.                                                                    |
+| **Citation validation**      | Checking that each citation in an answer points to evidence that was actually supplied, with matching metadata.                                                                                |
+| **No-coverage answer**       | The explicit reply given when nothing relevant was retrieved, instead of a general-knowledge answer.                                                                                           |
+| **Relative relevance**       | Reranker scores rescaled within one answer so the top precedent is 1.0; a ranking, not a probability.                                                                                          |
+| **Hallucination**            | A fluent model output that is not supported by any source, such as an invented case.                                                                                                           |
+| **NER**                      | Named-entity recognition: finding statutes, sections, courts and other entities in text.                                                                                                       |
+| **InLegalBERT**              | A language model pre-trained on Indian legal text. Fine-tuned for NER and combined with the rule-based NER, it is on by default after a bounded experiment (see [Experiments](/experiments/)). |
+| **OCR / Tesseract**          | Optical character recognition, reading text from scanned page images; Tesseract is the engine used.                                                                                            |
 
 ## Evaluation
 

@@ -44,6 +44,7 @@ Registration, resend and verification answer identically whether or not the emai
 
 - **Public responses** contain a plain-language explanation, the sections cited, sources (validated citations only) and `limitations`, such as an OCR confidence warning.
 - **Professional responses** contain identified sections, `precedents` (one per retrieved judgment, in rank order, with provenance, a verbatim excerpt, the raw reranker score, relative relevance and `cited_in_answer`) and a structured `case_brief`.
+- **Section references** (`identified_sections[]`, `case_brief.statutory_provision_references[]` and the public sections) carry a `label` object: `state` (`verified`, `corrected_statute`, `unverified` or `conflict`), the trusted `title` and its `source`, `statute_corrected_from`, `correction_reason` (`label` or `document_evidence`), `document_evidence_id` (the upload's P# reference) and `model_label`, which always keeps the answer's own wording for audit. Older history entries have no `label` and are shown as unverified.
 - Uploaded PDFs are used for that request only and are never added to the corpus.
 - Public routes are limited per client IP (5 a minute, 100 a day by default) and professional routes per user (10 a minute, 300 a day).
 
@@ -79,6 +80,7 @@ All analytics endpoints require the Lawyer role and return `200 []` when there i
 - Section labels are statute-qualified, such as `IPC 302` or `BNS 103`.
 - The first three count offence provisions only; `include_all_sections=true` returns every cited section.
 - `ncrb-stats` leaves out total and subtotal rows unless `include_aggregates=true`, so sums do not double count. Its `ipc_section` filter accepts `IPC 305`, `BNS 108` or a bare `305`.
+- `ipc-bns-map` rows also carry `ipc_official_heading` and `bns_official_heading` (from India Code) and `ipc_description_conflicts_with_official` / `bns_description_conflicts_with_official`, which flag source descriptions that disagree with the official heading. The descriptions themselves are not edited.
 - Aliases `/analytics/offence-frequency`, `/analytics/ipc-bns` and `/analytics/ncrb` return the same data.
 
 ## Error format
