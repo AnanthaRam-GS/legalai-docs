@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookCheck,
   CheckCircle2,
   FileScan,
   Gavel,
@@ -82,7 +83,10 @@ const dashboards = [
   ["Offence trends", "How often each offence provision is cited, by judgment year."],
   ["Outcome distribution", "Rule-extracted outcomes by section and court level."],
   ["Section co-occurrence", "Which offence provisions are cited together."],
-  ["IPC-BNS map", "Comparative mapping from IPC sections to their BNS counterparts."],
+  [
+    "IPC-BNS map",
+    "Comparative mapping from IPC sections to their BNS counterparts, with each section's official India Code heading; source descriptions that conflict with it are flagged, not edited.",
+  ],
   ["NCRB statistics", "Crime in India 2024, Table 1A.4: crime heads by State/UT."],
 ];
 
@@ -142,9 +146,10 @@ export default function FeaturesPage() {
               a validated citation; the rest were only retrieved.
             </>,
             <>
-              <strong>PDF briefs</strong> extract parties and roles, a dated chronology, procedural
-              stages (FIR, arrest, bail, charge sheet, trial, appeal…) and evidence by category,
-              each item ending with its page reference, for example <code>[P2, p. 3]</code>.
+              <strong>PDF briefs</strong> extract parties and roles (rules combined with a
+              fine-tuned InLegalBERT NER model), a dated chronology, procedural stages (FIR, arrest,
+              bail, charge sheet, trial, appeal…) and evidence by category, each item ending with
+              its page reference, for example <code>[P2, p. 3]</code>.
             </>,
             "Query history is kept per user, without any text quoted from uploaded documents.",
           ]}
@@ -158,11 +163,40 @@ export default function FeaturesPage() {
         </FeatureSection>
 
         <FeatureSection
+          id="section-labels"
+          icon={BookCheck}
+          eyebrow="Verified section labels"
+          title="Section titles come from the statute, not the model"
+          intro="The answer model's one-line section labels can be wrong, so every section it names is checked against trusted sources before it is shown."
+          points={[
+            <>
+              <strong>Trust order:</strong> the Act&rsquo;s official heading from India Code first,
+              then the legal section catalog, then the IPC-BNS mapping.
+            </>,
+            <>
+              <strong>Four states:</strong> <code>verified</code> shows the trusted title;{" "}
+              <code>corrected_statute</code> fixes a wrong statute of a pair such as BNS and BNSS;{" "}
+              <code>unverified</code> shows the model&rsquo;s wording marked &ldquo;Unverified
+              label&rdquo;; <code>conflict</code> shows no title when trusted sources disagree.
+            </>,
+            <>
+              <strong>Document evidence:</strong> when an uploaded document cites a section only
+              under the sister statute, the brief follows the document and says which page of the
+              upload it came from.
+            </>,
+            "The model's own label is always kept in the response data for audit; it is never shown as a trusted title.",
+            "CrPC sections have no official headings (India Code holds only a scan that cannot be read reliably), so they show a catalog title or stay unverified.",
+          ]}
+          screenshot={shots.professionalBriefChargesheet}
+        />
+
+        <FeatureSection
           id="analytics"
           icon={BarChart3}
           eyebrow="Analytics"
           title="Five dashboards over the corpus and official statistics"
           intro="Professional users can explore cited sections, outcomes and national crime statistics in a tabbed Recharts dashboard."
+          reverse
           points={dashboards.map(([name, body]) => (
             <>
               <strong>{name}:</strong> {body}
@@ -183,7 +217,6 @@ export default function FeaturesPage() {
           eyebrow="Admin"
           title="Corpus ingestion and store status"
           intro="Administrators add trusted judgments and see whether the three stores agree."
-          reverse
           points={[
             "Upload PDFs with metadata and follow each job through QUEUED, EXTRACTING, CHUNKING, EMBEDDING and INDEXING to COMPLETED or FAILED.",
             "Ingestion is all-or-nothing: a completed job is in PostgreSQL, Chroma and BM25; a failed job leaves nothing behind.",
@@ -200,6 +233,7 @@ export default function FeaturesPage() {
           eyebrow="OCR"
           title="Scanned PDFs are read with OCR"
           intro="Many FIRs and older judgments are scans with no text layer."
+          reverse
           points={[
             "A page is OCR'd with Tesseract only when its native text is under 50 characters and it contains an image; text pages are untouched.",
             "OCR text keeps its page number, so page references in briefs still work.",
@@ -215,7 +249,6 @@ export default function FeaturesPage() {
           eyebrow="Privacy"
           title="Uploads never enter the corpus"
           intro="A document uploaded for a question is used for that request only."
-          reverse
           points={[
             "Query uploads create no ingestion job and no vector or keyword index writes; they are parsed in a temporary directory.",
             "Query history never stores PDF bytes, extracted text, temporary chunks or server paths.",
