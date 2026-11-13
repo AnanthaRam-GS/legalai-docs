@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
+import Link from "next/link";
 import { Callout } from "@/components/ui/Callout";
 import { MetricTable } from "@/components/ui/MetricTable";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -8,7 +9,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 export const metadata: Metadata = {
   title: "Methodology",
   description:
-    "How LegalAI acquires data, chunks judgments, retrieves and reranks evidence, generates grounded answers, builds analytics data, runs OCR and evaluates itself.",
+    "How LegalAI acquires data, chunks judgments, retrieves and reranks evidence, generates grounded answers, verifies section labels, builds analytics data, runs OCR, evaluates itself and tests models.",
   alternates: { canonical: "/methodology/" },
 };
 
@@ -17,9 +18,11 @@ const sections = [
   { id: "chunking", label: "Chunking" },
   { id: "retrieval", label: "Retrieval and reranking" },
   { id: "generation", label: "Grounded generation" },
+  { id: "section-labels", label: "Section labels" },
   { id: "analytics", label: "Analytics data" },
   { id: "ocr", label: "OCR" },
   { id: "evaluation", label: "Evaluation" },
+  { id: "models", label: "Model experiments" },
   { id: "engineering", label: "Engineering practice" },
 ];
 
@@ -204,7 +207,56 @@ export default function MethodologyPage() {
           </ul>
         </Section>
 
-        <Section id="analytics" number={5} title="Analytics data pipeline">
+        <Section id="section-labels" number={5} title="Verified section labels">
+          <p>
+            The answer model names statutory provisions with a one-line label of its own, and those
+            labels can be wrong. Every section the model names is therefore resolved against trusted
+            sources before it reaches a response; the model&rsquo;s wording is never shown as a
+            trusted title.
+          </p>
+          <Steps
+            items={[
+              <>
+                <strong>Parse</strong> the provision with the project&rsquo;s deterministic section
+                extractor (statute, section, sub-section, and the model&rsquo;s label).
+              </>,
+              <>
+                <strong>Look up</strong> a title in order of trust, the first source with an entry
+                winning: the Act&rsquo;s official heading from India Code, then the legal section
+                catalog, then the IPC-to-BNS mapping.
+              </>,
+              <>
+                <strong>Decide the state:</strong> <code>verified</code> (a trusted title is shown),{" "}
+                <code>corrected_statute</code> (the answer named the wrong statute of a pair such as
+                BNS and BNSS), <code>unverified</code> (no trusted title: the model&rsquo;s label is
+                shown, marked &ldquo;Unverified label&rdquo;) or <code>conflict</code> (trusted
+                sources disagree, so no title is shown).
+              </>,
+            ]}
+          />
+          <p>
+            A statute is corrected in two ways. If the model&rsquo;s label clearly fits the sister
+            statute&rsquo;s section with the same number (&ldquo;BNS 173, registration of FIR&rdquo;
+            is BNSS 173), the label decides. For an uploaded document, if the document cites the
+            number only under the sister statute, the <strong>document-evidence correction</strong>{" "}
+            applies and names the page of the upload it came from. In an offline test on every saved
+            brief and the 5 fixtures, it made 0 wrong corrections. The model&rsquo;s own label is
+            always kept in the data for audit.
+          </p>
+          <p>
+            <strong>Official headings</strong> come from India Code, the official legislative
+            repository: 548 IPC headings (plus 21 omitted or repealed sections), 181 for the
+            Evidence Act, 358 for the BNS, 531 for the BNSS and 170 for the BSA. IPC and Evidence
+            Act headings were read from each Act&rsquo;s PDF and kept only when the printed
+            arrangement and the body agree; 70 of 70 rendered spot checks matched. With them, the
+            corpus-cited sections that have a trusted title rose from{" "}
+            <strong>57 to 214 of 370</strong>. The <strong>CrPC has no official headings</strong>:
+            India Code&rsquo;s only copy is a scan of the Act as enacted in 1974 that cannot be read
+            reliably, so CrPC sections keep their catalog title or stay unverified.
+          </p>
+        </Section>
+
+        <Section id="analytics" number={6} title="Analytics data pipeline">
           <p>
             <strong>Cited sections</strong> are extracted with deterministic rules that normalise
             judgment citation forms (&ldquo;u/s&rdquo;, &ldquo;302/34&rdquo;, &ldquo;r/w&rdquo;) and
@@ -229,7 +281,7 @@ export default function MethodologyPage() {
           </p>
         </Section>
 
-        <Section id="ocr" number={6} title="OCR for scanned PDFs">
+        <Section id="ocr" number={7} title="OCR for scanned PDFs">
           <p>
             PyMuPDF extracts native text first. A page is sent to <strong>Tesseract</strong> (300
             DPI, grayscale) only if its native text is under 50 characters and it contains an image.
@@ -239,7 +291,7 @@ export default function MethodologyPage() {
           </p>
         </Section>
 
-        <Section id="evaluation" number={7} title="Evaluation methodology">
+        <Section id="evaluation" number={8} title="Evaluation methodology">
           <p>
             <strong>Retrieval.</strong>
           </p>
@@ -262,9 +314,9 @@ export default function MethodologyPage() {
             as X, Y and Z.
           </p>
           <p>
-            Model choices were made the same way. Deterministic NER was kept after two pretrained
-            candidates failed to improve F1 on a 36-example gold set, and section ranking uses the
-            BGE cross-encoder, which scored best on 36 human-reviewed queries.
+            Model choices were made the same way: section ranking uses the BGE cross-encoder, which
+            scored best on 36 human-reviewed queries, and InLegalBERT was adopted for NER only after
+            a bounded experiment (below).
           </p>
           <Callout kind="warning" title="Known limits of the evaluation">
             One reviewer, 30 queries, pooled rather than exhaustive relevance, a 70-judgment corpus,
@@ -274,7 +326,23 @@ export default function MethodologyPage() {
           </Callout>
         </Section>
 
-        <Section id="engineering" number={8} title="Engineering practice">
+        <Section id="models" number={9} title="Model experiments">
+          <p>
+            The planned fine-tuned InLegalBERT was tested rather than assumed. Pass thresholds were
+            frozen before training, held-out gold sets were scored once, and each step&rsquo;s rules
+            were committed before its code. The NER model passed (F1 0.915 against the rules&rsquo;
+            0.788); the section classifier was skipped because no open BNS or BNSS training data
+            exists; one brief experiment failed its precision rule and was redone under a new frozen
+            rule and a held-out judge. The full record, including the failure and the limitations,
+            is on the{" "}
+            <Link href="/experiments/" className="font-medium text-accent underline">
+              Experiments
+            </Link>{" "}
+            page.
+          </p>
+        </Section>
+
+        <Section id="engineering" number={10} title="Engineering practice">
           <ul className="list-disc space-y-2 pl-5">
             <li>
               <strong>Isolated test database.</strong> Database-backed suites refuse to run unless
@@ -297,7 +365,7 @@ export default function MethodologyPage() {
             </li>
             <li>
               <strong>Pull requests.</strong> Work lands on main through feature branches and
-              reviewed pull requests (78 so far).
+              reviewed pull requests (86 so far).
             </li>
             <li>
               <strong>Continuous integration.</strong> GitHub Actions runs the backend, database,
