@@ -205,7 +205,7 @@ export default function TechStackPage() {
             ))}
           </div>
           <p className="mt-4 text-xs text-subtle">
-            Versions as pinned in the LegalAI repository at commit b11249b: frontend/package.json
+            Versions as pinned in the LegalAI repository at commit 220eb02: frontend/package.json
             and requirements.txt.
           </p>
         </section>

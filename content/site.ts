@@ -69,8 +69,7 @@ export interface RoadmapItem {
 export const site = {
   name: "LegalAI",
   title: "LegalAI: An Intelligent Criminal Legal Assistance and Analytics System",
-  tagline:
-    "Grounded answers on Indian criminal law, with every citation traced to a retrieved judgment.",
+  tagline: "Answers on Indian criminal law, with every citation traced to a retrieved judgment.",
   description:
     "Project documentation for LegalAI, a retrieval-augmented legal assistant and analytics system for Indian criminal law, built as a final-year project at Amrita Vishwa Vidyapeetham.",
   course: "23CSE399 Final Year Project",
@@ -86,7 +85,7 @@ export const site = {
   /** ISO date of the last content review. */
   lastUpdated: "2026-11-13",
   /** Commit of the LegalAI main branch that the facts on this site describe. */
-  sourceCommit: "b11249b",
+  sourceCommit: "220eb02",
 } as const;
 
 export const guide: Person = {
@@ -213,21 +212,21 @@ export const stats: Stat[] = [
   {
     id: "backend-tests",
     label: "Backend test cases",
-    value: 1246,
+    value: 1252,
     detail: "across 99 Python test modules",
     sample: "Test methods defined on main (static count, not a pass count)",
     asOf: "2026-11-13",
-    source: "backend/scripts/tests/test_*.py on main @ b11249b",
+    source: "backend/scripts/tests/test_*.py on main @ 220eb02",
     status: "completed",
   },
   {
     id: "frontend-tests",
     label: "Frontend test cases",
-    value: 316,
+    value: 319,
     detail: "across 43 Vitest files",
     sample: "Test cases defined on main (static count, not a pass count)",
     asOf: "2026-11-13",
-    source: "frontend/**/*.test.ts(x) on main @ b11249b",
+    source: "frontend/**/*.test.ts(x) on main @ 220eb02",
     status: "completed",
   },
   {
@@ -329,7 +328,12 @@ export const phases: Phase[] = [
       {
         label: "Three-configuration answer evaluation (LLM only, dense RAG, full pipeline)",
         status: "completed",
-        note: "30 queries re-run in October 2026; the human review of a 15-query sample is pending.",
+        note: "30 queries re-run in October 2026; a 15-query sample reviewed by an AI reviewer in two rounds.",
+      },
+      {
+        label: "Evaluation review completed (AI-reviewed, two rounds); human verification pending",
+        status: "completed",
+        note: "Round 2, with full passages: about two-thirds of citations fully supported and three-quarters at least partly; 7 still state the wrong law.",
       },
       {
         label: "Benchmark expansion by about 70 queries",
@@ -370,6 +374,7 @@ export const reviewChecklist: PhaseItem[] = [
   {
     label: "RAG pipeline: hybrid retrieval + reranker returning grounded results",
     status: "completed",
+    note: "Every citation points at retrieved evidence (structural); on AI review, about two-thirds are fully supported by the cited passage (October 2026, human check pending).",
   },
   {
     label: "/query/professional returning sections, citations and a structured case brief",
@@ -605,13 +610,21 @@ export const milestones: Milestone[] = [
     refs: "PR #86",
     status: "completed",
   },
+  {
+    date: "2026-11-13",
+    title: "Evaluation review, two rounds",
+    description:
+      "An AI reviewer, blind to configuration, judged the 15 × 3 sample: round 1 on 600-character excerpts, round 2 on full passages. Fully supported citations rose from about 21% to 67%; human verification is pending.",
+    refs: "PRs #88–#90",
+    status: "completed",
+  },
 ];
 
 export const roadmap: RoadmapItem[] = [
   {
-    title: "Human review of the October 2026 evaluation",
+    title: "Human verification of the October 2026 review",
     description:
-      "Reviewers judge a blinded sample of 15 queries × 3 configurations for legal correctness and whether each cited authority supports its claim.",
+      "A person checks the AI review of the blinded 15 queries × 3 configurations sample, starting with the 7 citations judged to state the wrong law and the 12 judged not supported.",
     status: "planned",
   },
   {

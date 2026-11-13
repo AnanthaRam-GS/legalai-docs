@@ -4,11 +4,11 @@ LegalAI is tested at four levels: fast unit and contract tests, database-backed 
 
 | Suite               | Runner                     | Size on `main` (13 November 2026)                            |
 | ------------------- | -------------------------- | ------------------------------------------------------------ |
-| Backend tests       | Python `unittest`          | 1,246 test methods in 99 modules, 13 of them database-backed |
-| Frontend tests      | Vitest and Testing Library | 316 test cases in 43 files                                   |
+| Backend tests       | Python `unittest`          | 1,252 test methods in 99 modules, 13 of them database-backed |
+| Frontend tests      | Vitest and Testing Library | 319 test cases in 43 files                                   |
 | End-to-end journeys | Playwright (Chromium)      | 15 tests in 6 spec files                                     |
 
-These are counts of tests defined in the code at commit `b11249b`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+These are counts of tests defined in the code at commit `220eb02`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
 
 ## Continuous integration
 
@@ -66,6 +66,6 @@ Live runs send real questions through the full pipeline with a live answer model
 ## Not yet in place
 
 - **User acceptance testing** with law students or practitioners and with non-technical users <StatusBadge status="planned" />
-- **Human review** of the October 2026 answer evaluation <StatusBadge status="planned" label="Pending" />
+- **Human verification** of the October 2026 answer review, which was done by an AI reviewer in two rounds <StatusBadge status="planned" label="Pending" />
 
 Source: `docs/TESTING.md`, `docs/OCR.md`, `docs/performance/PERFORMANCE_BASELINE.md`, `docs/live_runs/LIVE_RUN_SUMMARY.md` and `docs/API_CONTRACTS.md` in the LegalAI repository; test counts from `backend/scripts/tests/` and the frontend test files on `main`.
