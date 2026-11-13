@@ -84,9 +84,9 @@ export const site = {
   /** YouTube or Google Drive link. Leave empty to show the "coming soon" state. */
   demoVideoUrl: "",
   /** ISO date of the last content review. */
-  lastUpdated: "2026-11-08",
+  lastUpdated: "2026-11-13",
   /** Commit of the LegalAI main branch that the facts on this site describe. */
-  sourceCommit: "2fb2f7c",
+  sourceCommit: "b11249b",
 } as const;
 
 export const guide: Person = {
@@ -213,21 +213,21 @@ export const stats: Stat[] = [
   {
     id: "backend-tests",
     label: "Backend test cases",
-    value: 1126,
-    detail: "across 94 Python test modules",
+    value: 1246,
+    detail: "across 99 Python test modules",
     sample: "Test methods defined on main (static count, not a pass count)",
-    asOf: "2026-11-08",
-    source: "backend/scripts/tests/test_*.py on main @ 2fb2f7c",
+    asOf: "2026-11-13",
+    source: "backend/scripts/tests/test_*.py on main @ b11249b",
     status: "completed",
   },
   {
     id: "frontend-tests",
     label: "Frontend test cases",
-    value: 300,
-    detail: "across 41 Vitest files",
+    value: 316,
+    detail: "across 43 Vitest files",
     sample: "Test cases defined on main (static count, not a pass count)",
-    asOf: "2026-11-08",
-    source: "frontend/**/*.test.ts(x) on main @ 2fb2f7c",
+    asOf: "2026-11-13",
+    source: "frontend/**/*.test.ts(x) on main @ b11249b",
     status: "completed",
   },
   {
@@ -262,8 +262,8 @@ export const phases: Phase[] = [
       },
       {
         label: "InLegalBERT fine-tuning",
-        status: "pending-approval",
-        note: "Two pretrained candidates did not beat the deterministic NER baseline, so no model was promoted.",
+        status: "completed",
+        note: "Fine-tuned for NER in a bounded experiment (November 2026): exact F1 0.915 against the rules' 0.788 on held-out gold. The section classifier was not feasible: no open BNS/BNSS data.",
       },
       { label: "Initial corpus ingestion", status: "completed" },
     ],
@@ -279,7 +279,7 @@ export const phases: Phase[] = [
       {
         label: "Legal NLP services",
         status: "pending-approval",
-        note: "Deterministic NER and a BGE cross-encoder section ranker in place of InLegalBERT.",
+        note: "InLegalBERT NER combined with the rules, on by default with a rules-only fallback; a BGE cross-encoder ranks sections. Adopted under the guide's rule; sign-off pending.",
       },
       { label: "Hybrid retrieval and reranking", status: "completed" },
       { label: "LLM generation layer", status: "completed" },
@@ -365,7 +365,7 @@ export const reviewChecklist: PhaseItem[] = [
   {
     label: "InLegalBERT NER and section classifier integrated",
     status: "pending-approval",
-    note: "Replaced by deterministic NER and a BGE cross-encoder section ranker after evaluation.",
+    note: "InLegalBERT NER integrated and on by default after it passed held-out tests; the multi-label classifier was not feasible (no open BNS data), so BGE section ranking remains. Guide sign-off pending.",
   },
   {
     label: "RAG pipeline: hybrid retrieval + reranker returning grounded results",
@@ -581,6 +581,30 @@ export const milestones: Milestone[] = [
     refs: "PRs #76–#78",
     status: "completed",
   },
+  {
+    date: "2026-11-08",
+    title: "Verified section labels",
+    description:
+      "Every section an answer names is resolved against trusted sources: a trusted title is shown, a wrong statute is corrected, and the model's own label is kept for audit and marked unverified when nothing trusted exists.",
+    refs: "PR #79",
+    status: "completed",
+  },
+  {
+    date: "2026-11-12",
+    title: "InLegalBERT experiments",
+    description:
+      "A bounded experiment with thresholds frozen before training: NER F1 0.915 vs 0.788, no retrieval or brief regression, a failed Parties & Roles step, then a held-out judge passing all six rules. The combined NER is on by default.",
+    refs: "PRs #80–#85",
+    status: "completed",
+  },
+  {
+    date: "2026-11-13",
+    title: "Official section headings",
+    description:
+      "IPC, Evidence Act, BNS, BNSS and BSA headings from India Code (57 → 214 of 370 cited sections titled), document-evidence statute correction, a larger brief output budget, and official headings with conflict flags in the IPC-BNS dashboard.",
+    refs: "PR #86",
+    status: "completed",
+  },
 ];
 
 export const roadmap: RoadmapItem[] = [
@@ -593,7 +617,7 @@ export const roadmap: RoadmapItem[] = [
   {
     title: "InLegalBERT and LlamaIndex scope decision",
     description:
-      "The implementation uses deterministic NER and a hand-built hybrid retriever instead of the planned InLegalBERT and LlamaIndex. This change awaits the guide's approval.",
+      "InLegalBERT NER was adopted under the guide's rule after a bounded experiment, and the section classifier was dropped for lack of open BNS data; the retriever is hand-built instead of LlamaIndex. Both await the guide's sign-off.",
     status: "pending-approval",
   },
   {
@@ -601,6 +625,12 @@ export const roadmap: RoadmapItem[] = [
     description:
       "Add about 70 retrieval queries with human labels, using the labelling kit and the frozen pooling rules, then recompute the retrieval metrics.",
     status: "in-progress",
+  },
+  {
+    title: "Human check of the InLegalBERT judge and real FIRs",
+    description:
+      "Have a person verify the 5 AI-labelled judge excerpts, and test the accused-role fix on a held-out set of real FIRs and charge sheets.",
+    status: "planned",
   },
   {
     title: "Check case names in answer text",

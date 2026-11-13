@@ -2,13 +2,13 @@ LegalAI is tested at four levels: fast unit and contract tests, database-backed 
 
 ## Test suites at a glance
 
-| Suite               | Runner                     | Size on `main` (8 November 2026)                             |
+| Suite               | Runner                     | Size on `main` (13 November 2026)                            |
 | ------------------- | -------------------------- | ------------------------------------------------------------ |
-| Backend tests       | Python `unittest`          | 1,126 test methods in 94 modules, 13 of them database-backed |
-| Frontend tests      | Vitest and Testing Library | 300 test cases in 41 files                                   |
+| Backend tests       | Python `unittest`          | 1,246 test methods in 99 modules, 13 of them database-backed |
+| Frontend tests      | Vitest and Testing Library | 316 test cases in 43 files                                   |
 | End-to-end journeys | Playwright (Chromium)      | 15 tests in 6 spec files                                     |
 
-These are counts of tests defined in the code at commit `2fb2f7c`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
+These are counts of tests defined in the code at commit `b11249b`, not a record of a passing run. Database-backed modules run separately from the rest so that nothing touches development data.
 
 ## Continuous integration
 
