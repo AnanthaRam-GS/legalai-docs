@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChartFrame } from "@/components/charts/ChartFrame";
-import { GroundingChart } from "@/components/charts/GroundingChart";
+import { ComparisonChart } from "@/components/charts/ComparisonChart";
 import { LatencyChart } from "@/components/charts/LatencyChart";
 import { RetrievalChart } from "@/components/charts/RetrievalChart";
 import { Container } from "@/components/layout/Container";
@@ -55,6 +55,25 @@ function ResultSection({
   );
 }
 
+const REVIEW_CHART = [
+  {
+    metric: "B strict",
+    "Round 1 (600-character excerpts)": 0.225,
+    "Round 2 (full passages)": 0.65,
+  },
+  {
+    metric: "B lenient",
+    "Round 1 (600-character excerpts)": 0.7,
+    "Round 2 (full passages)": 0.775,
+  },
+  { metric: "C strict", "Round 1 (600-character excerpts)": 0.19, "Round 2 (full passages)": 0.69 },
+  {
+    metric: "C lenient",
+    "Round 1 (600-character excerpts)": 0.595,
+    "Round 2 (full passages)": 0.762,
+  },
+];
+
 const Meta = ({ children }: { children: ReactNode }) => (
   <span className="rounded-md bg-surface-2 px-2 py-0.5 text-xs font-medium text-fg">
     {children}{" "}
@@ -95,7 +114,7 @@ export default function ResultsPage() {
               <Meta>30 queries × 3 configurations</Meta>
               <Meta>Groq gpt-oss-120b / 20b, prompt v3</Meta>
               <Meta>30 October – 1 November 2026</Meta>
-              <Meta>Human review pending</Meta>
+              <Meta>AI-reviewed in two rounds; human check pending</Meta>
             </>
           }
         >
@@ -186,13 +205,81 @@ export default function ResultsPage() {
           </p>
 
           <h3 className="mt-8 font-serif text-xl font-bold text-fg">Answer generation</h3>
+          <p>
+            Grounding is reported at three levels, each with its own sample.{" "}
+            <strong>Structural</strong> grounding asks whether every citation points at real
+            retrieved evidence with matching metadata; it is checked automatically on every answer.{" "}
+            <strong>Reviewed</strong> grounding asks whether the cited passage actually supports the
+            claim. It was judged on a stratified review sample of 15 queries × 3 configurations by
+            an AI reviewer, so it uses that sample, not the 24-query paired set.
+          </p>
+          <MetricTable
+            caption="Grounding at three levels, by configuration"
+            columns={[
+              { key: "measure", label: "Measure" },
+              { key: "a", label: "A, LLM only", numeric: true },
+              { key: "b", label: "B, dense RAG", numeric: true },
+              { key: "c", label: "C, full LegalAI", numeric: true },
+            ]}
+            rows={[
+              {
+                measure:
+                  "Structural: citations pointing at real retrieved evidence (paired, 24 queries)",
+                a: "n/a (no citations)",
+                b: "100% (71/71)",
+                c: "100% (73/73)",
+              },
+              {
+                measure: "Structural, on the review sample",
+                a: "n/a",
+                b: "100% (40/40)",
+                c: "100% (42/42)",
+              },
+              {
+                measure: "Reviewed, strict: fully supported (round 2)",
+                a: "n/a",
+                b: "65.0% (26/40)",
+                c: "69.0% (29/42)",
+                highlight: true,
+              },
+              {
+                measure: "Reviewed, lenient: at least partly supported (round 2)",
+                a: "n/a",
+                b: "77.5% (31/40)",
+                c: "76.2% (32/42)",
+                highlight: true,
+              },
+              {
+                measure: "Citations judged to state the wrong law (round 2)",
+                a: "n/a",
+                b: "10.0% (4/40)",
+                c: "7.1% (3/42)",
+              },
+              {
+                measure: "Answers judged correct (of answers judged)",
+                a: "43% (6/14)",
+                b: "55% (6/11)",
+                c: "46% (6/13)",
+              },
+            ]}
+            footnote="Sources: docs/evaluation/EVALUATION_2026-10.md (sections 3 and 4) and data/evaluation/runs/2026-10_v3_groq/human_review/result.json (round 1) and result_round2.json (round 2). Reviewed rates count structured citations only. Answer correctness is from round 1 (round 2 re-judged citations, not answers); abstentions, failed answers and cannot-judge are excluded from its denominator. A cites no evidence, so it has no citation measures."
+          />
           <ChartFrame
-            title="Answers with at least one validly cited claim"
-            description="Share of schema-valid answers in which at least one claim cites retrieved evidence that passed validation. Higher is better; the y-axis starts at zero."
-            footnote="Source: docs/evaluation/EVALUATION_2026-10.md, section 3 (Results). Paired: the 24 queries all three configurations answered (13 public, 11 professional). Public and professional: all schema-valid answers of each mode (A 15 and 12, B 15 and 14, C 13 and 15). A has no evidence, so it is 0% by construction."
+            title="Reviewed citation support, round 1 vs round 2"
+            description="Share of structured citations judged fully (strict) or at least partly (lenient) supported. B: 40 citations; C: 42 citations; 15 queries × 3 configurations. Higher is better."
+            footnote="Round 1 saw each cited passage cut at 600 characters; round 2 re-judged, with the full passage, only the citations round 1 did not call fully supported. Source: data/evaluation/runs/2026-10_v3_groq/human_review/result_round2.json."
           >
-            <GroundingChart />
+            <ComparisonChart
+              data={REVIEW_CHART}
+              systems={["Round 1 (600-character excerpts)", "Round 2 (full passages)"]}
+              ariaLabel="Grouped bar chart. B strict: round 1 0.225, round 2 0.650. B lenient: 0.700 and 0.775. C strict: 0.190 and 0.690. C lenient: 0.595 and 0.762."
+            />
           </ChartFrame>
+          <p>
+            With the full passages, strict support across B and C rose from 17 to 55 of 82
+            citations: the 600-character cut caused most of round 1&rsquo;s gap. About a third of
+            citations are still not fully supported.
+          </p>
           <MetricTable
             caption="Three-configuration generation results"
             columns={[
@@ -202,19 +289,6 @@ export default function ResultsPage() {
               { key: "c", label: "C, full LegalAI", numeric: true },
             ]}
             rows={[
-              {
-                measure: "Paired (24 queries): answers with ≥1 valid grounded claim",
-                a: "0%",
-                b: "87.5% (21/24)",
-                c: "95.8% (23/24)",
-                highlight: true,
-              },
-              {
-                measure: "Paired: valid / total citations",
-                a: "0 / 0",
-                b: "71 / 71",
-                c: "73 / 73",
-              },
               {
                 measure: "Schema pass, all 30 queries",
                 a: "27 / 30",
@@ -240,12 +314,6 @@ export default function ResultsPage() {
                 c: "85 / 85",
               },
               {
-                measure: "Grounded answers, public / professional",
-                a: "0% / 0%",
-                b: "80.0% / 92.9%",
-                c: "92.3% / 93.3%",
-              },
-              {
                 measure: "Out-of-scope queries answered “not covered” (4)",
                 a: "0 / 4",
                 b: "2 / 4",
@@ -257,11 +325,25 @@ export default function ResultsPage() {
           <Callout kind="warning" title="Caveats for the October 2026 evaluation">
             <ul className="list-disc space-y-2 pl-5">
               <li>
-                <strong>Structural, not human-verified.</strong> A valid citation points at real
-                retrieved evidence with matching metadata; it does not prove the evidence supports
-                the claim or that the law is right. A blinded human review of 15 queries × 3
-                configurations has been prepared and is <strong>pending</strong>.{" "}
-                <StatusBadge status="planned" label="Pending" />
+                <strong>AI-reviewed, not human-verified.</strong> The review was done by an AI chat
+                assistant (not Claude Code), blind to which configuration produced each answer, and
+                no person has verified it.{" "}
+                <StatusBadge status="planned" label="Human check pending" />
+              </li>
+              <li>
+                <strong>Two rounds, with a known bias.</strong> Round 1 saw each cited passage cut
+                at 600 characters. Round 2 re-judged, with the full passages, only the citations
+                round 1 had not called fully supported, after seeing round 1&rsquo;s verdicts, so it
+                may anchor on them and could mostly only move judgments up.
+              </li>
+              <li>
+                <strong>B and C cannot be told apart.</strong> With about 40 citations each, one
+                judgment moves a rate by about 2.5 points; B and C are statistically
+                indistinguishable on this sample.
+              </li>
+              <li>
+                <strong>7 citations still state the wrong law,</strong> 3 of them in IPC-to-BNS
+                transition reasoning (for example, that murder after 1 July 2024 is still IPC 302).
               </li>
               <li>
                 <strong>Unsupported case names in the answer text.</strong> The validator checks
@@ -272,14 +354,13 @@ export default function ResultsPage() {
               <li>
                 <strong>Provider and prompt.</strong> Answers came from Groq: professional answers
                 from gpt-oss-120b only, public answers from gpt-oss-20b or, when it was at capacity,
-                gpt-oss-120b. All used prompt v3. Differences of a few answers are within noise.
+                gpt-oss-120b. All used prompt v3.
               </li>
               <li>
                 <strong>Historical Gemini run.</strong> The frozen September 2026 answer evaluation
-                used Gemini (gemini-3.6-flash) with prompt v1: in its grounded condition 29 of 30
-                answers parsed and 23 were structurally grounded. It is kept unchanged as a
-                historical baseline and is not directly comparable with this run.{" "}
-                <StatusBadge status="historical" />
+                used Gemini (gemini-3.6-flash) with prompt v1: 29 of 30 answers parsed and 23 passed
+                the structural citation check. It is kept unchanged as a historical baseline and is
+                not directly comparable with this run. <StatusBadge status="historical" />
               </li>
             </ul>
           </Callout>
