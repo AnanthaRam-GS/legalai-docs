@@ -1,5 +1,6 @@
 import { Brain, Database, Monitor, Server, Wrench, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { Container } from "@/components/layout/Container";
 import { Reveal } from "@/components/motion/Reveal";
@@ -52,6 +53,10 @@ const LAYERS: { name: string; icon: LucideIcon; items: Tech[] }[] = [
       { name: "BAAI/bge-m3", detail: "1024-d dense embeddings (FlagEmbedding)" },
       { name: "BM25", detail: "Project-built keyword index, k1 1.5, b 0.75" },
       { name: "BAAI/bge-reranker-v2-m3", detail: "Cross-encoder reranker, fp16 on Apple MPS" },
+      {
+        name: "law-ai/InLegalBERT (fine-tuned)",
+        detail: "NER combined with the rules, on by default; rules-only fallback",
+      },
       { name: "Groq · openai/gpt-oss-120b", detail: "Professional answers and PDF briefs" },
       {
         name: "Groq · openai/gpt-oss-20b",
@@ -88,7 +93,7 @@ interface Deviation {
   planned: string;
   implemented: string;
   reason: ReactNode;
-  status: Status | "as-planned" | "no-record" | "not-adopted";
+  status: Status | "as-planned" | "no-record" | "not-adopted" | "not-feasible" | "adopted-pending";
 }
 
 const DEVIATIONS: Deviation[] = [
@@ -102,12 +107,30 @@ const DEVIATIONS: Deviation[] = [
     status: "in-progress",
   },
   {
-    component: "Legal NLP model",
-    planned: "Fine-tuned InLegalBERT for NER and section classification",
-    implemented: "Deterministic NER; BGE cross-encoder for section ranking",
+    component: "Legal NER",
+    planned: "Fine-tuned InLegalBERT",
+    implemented:
+      "InLegalBERT fine-tuned on InLegalNER, combined with the rule-based NER; on by default, falling back to the rules",
+    reason: (
+      <>
+        Adopted through a bounded experiment with thresholds frozen before training: exact F1 0.915
+        against the rules&rsquo; 0.788 on held-out gold, no retrieval or brief regression, and a
+        held-out Parties &amp; Roles judge passed after an earlier step failed. Details on the{" "}
+        <Link href="/experiments/" className="font-medium text-accent underline">
+          Experiments
+        </Link>{" "}
+        page.
+      </>
+    ),
+    status: "adopted-pending",
+  },
+  {
+    component: "Section classifier",
+    planned: "Multi-label InLegalBERT IPC/BNS classifier",
+    implemented: "BGE cross-encoder ranking over a bounded section catalog",
     reason:
-      "Neither pretrained NER candidate improved F1 over the deterministic baseline (0.788) on a 36-example gold set, which is too small for responsible fine-tuning. The cross-encoder ranked sections best.",
-    status: "pending-approval",
+      "Not feasible: no open BNS or BNSS training data exists, and the only open set (ILSI, IPC-only) covers 22 of the 60 gold labels, where the ranker is already near its ceiling. Skipped by decision; nothing was trained.",
+    status: "not-feasible",
   },
   {
     component: "Retrieval orchestration",
@@ -182,7 +205,7 @@ export default function TechStackPage() {
             ))}
           </div>
           <p className="mt-4 text-xs text-subtle">
-            Versions as pinned in the LegalAI repository at commit 2fb2f7c: frontend/package.json
+            Versions as pinned in the LegalAI repository at commit b11249b: frontend/package.json
             and requirements.txt.
           </p>
         </section>
@@ -229,6 +252,10 @@ export default function TechStackPage() {
                         <StatusBadge status="in-progress" label="Temporary" />
                       ) : row.status === "no-record" ? (
                         <StatusBadge status="planned" label="No decision record" />
+                      ) : row.status === "adopted-pending" ? (
+                        <StatusBadge status="pending-approval" label="Adopted, sign-off pending" />
+                      ) : row.status === "not-feasible" ? (
+                        <StatusBadge status="historical" label="Not feasible" />
                       ) : row.status === "not-adopted" ? (
                         <StatusBadge status="historical" label="Not adopted" />
                       ) : row.status === "completed" ? (
@@ -244,9 +271,9 @@ export default function TechStackPage() {
           </div>
           <Callout kind="info" title="Sources">
             Build plan (Confirmed Technology Stack and System Flow),
-            docs/LLM_PROVIDER_CONFIGURATION.md, docs/LEGAL_NER_SELECTION_DECISION.md,
-            docs/LEGAL_SECTION_RANKING_SELECTION_DECISION.md, docs/JUDGMENT_DOCUMENT_PROCESSING.md
-            and docs/performance/PERFORMANCE_BASELINE.md.
+            docs/LLM_PROVIDER_CONFIGURATION.md, docs/experiments/INLEGALBERT_DECISION.md,
+            docs/LEGAL_NER_SELECTION_DECISION.md, docs/LEGAL_SECTION_RANKING_SELECTION_DECISION.md,
+            docs/JUDGMENT_DOCUMENT_PROCESSING.md and docs/performance/PERFORMANCE_BASELINE.md.
           </Callout>
         </section>
       </Container>
