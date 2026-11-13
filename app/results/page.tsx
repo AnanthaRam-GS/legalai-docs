@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { ChartFrame } from "@/components/charts/ChartFrame";
 import { GroundingChart } from "@/components/charts/GroundingChart";
@@ -13,7 +14,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 export const metadata: Metadata = {
   title: "Results",
   description:
-    "The October 2026 three-configuration evaluation, retrieval quality, reranker latency, OCR accuracy, citation validity, NCRB validation and store reconciliation, each with its sample size, date and source.",
+    "The October 2026 three-configuration evaluation, retrieval quality, reranker latency, OCR accuracy, citation validity, NCRB validation, store reconciliation, the InLegalBERT experiments and section-label coverage, each with its sample size, date and source.",
   alternates: { canonical: "/results/" },
 };
 
@@ -25,6 +26,8 @@ const toc = [
   { id: "citations", label: "Citation validity" },
   { id: "ncrb", label: "NCRB validation" },
   { id: "reconciliation", label: "Reconciliation" },
+  { id: "experiments", label: "Model experiments" },
+  { id: "section-labels", label: "Section labels" },
 ];
 
 function ResultSection({
@@ -608,6 +611,99 @@ export default function ResultsPage() {
               Outcome values remain <strong>unreviewed</strong> pending legal review.
             </li>
           </ul>
+        </ResultSection>
+
+        <ResultSection
+          id="experiments"
+          title="Model experiments: InLegalBERT"
+          meta={
+            <>
+              <StatusBadge status="pending-approval" label="Adopted — sign-off pending" />
+              <Meta>Thresholds frozen before training</Meta>
+              <Meta>11–12 November 2026</Meta>
+            </>
+          }
+        >
+          <MetricTable
+            caption="Held-out results, each scored once"
+            columns={[
+              { key: "test", label: "Test" },
+              { key: "before", label: "Before", numeric: true },
+              { key: "after", label: "With InLegalBERT", numeric: true },
+              { key: "verdict", label: "Frozen rule" },
+            ]}
+            rows={[
+              {
+                test: "E1 NER, exact F1 (36 examples, 89 entities)",
+                before: "0.788",
+                after: "0.915",
+                verdict: "Pass",
+                highlight: true,
+              },
+              {
+                test: "E3 retrieval nDCG@5 (30 queries)",
+                before: "0.819",
+                after: "0.819",
+                verdict: "Pass (no regression)",
+              },
+              {
+                test: "E4 Parties & Roles precision (15 documents)",
+                before: "1.000",
+                after: "0.846",
+                verdict: "Fail",
+              },
+              {
+                test: "E4c Parties & Roles F1 (5 held-out excerpts, 17 parties)",
+                before: "0.000",
+                after: "0.839",
+                verdict: "Pass (AI-labelled judge)",
+              },
+            ]}
+            footnote="Sources: docs/experiments/INLEGALBERT_E1_RESULTS.md, INLEGALBERT_E3_RESULTS.md, NER_PARTY_ROLES_RESULTS.md and INLEGALBERT_DECISION.md."
+          />
+          <p>
+            The protocol, per-seed results, the E4 failure and the limitations are on the{" "}
+            <Link href="/experiments/" className="font-medium text-accent underline">
+              Experiments
+            </Link>{" "}
+            page.
+          </p>
+        </ResultSection>
+
+        <ResultSection
+          id="section-labels"
+          title="Section-label coverage"
+          meta={
+            <>
+              <Meta>370 distinct corpus-cited sections</Meta>
+              <Meta>12–13 November 2026</Meta>
+              <Meta>Unreviewed</Meta>
+            </>
+          }
+        >
+          <MetricTable
+            caption="Corpus-cited sections with a trusted title"
+            columns={[
+              { key: "statute", label: "Statute (distinct cited sections)" },
+              { key: "before", label: "Catalog + mapping", numeric: true },
+              { key: "after", label: "Official headings first", numeric: true },
+            ]}
+            rows={[
+              { statute: "IPC (173)", before: "26", after: "161" },
+              { statute: "CrPC (105)", before: "5", after: "5" },
+              { statute: "Evidence Act (13)", before: "0", after: "12" },
+              { statute: "BNS (16)", before: "13", after: "16" },
+              { statute: "BNSS (12)", before: "5", after: "12" },
+              { statute: "All (370)", before: "57", after: "214", highlight: true },
+            ]}
+            footnote="Special Acts (NDPS, POCSO, SC/ST) are unchanged. Source: docs/SECTION_LABELS.md, Coverage before and after (backend/scripts/section_label_coverage.py, no provider calls)."
+          />
+          <p>
+            The document-evidence statute correction was tested offline before any live call, on
+            every saved brief from steps 22–26b and a probe of the 5 brief fixtures: 16 correct
+            document-evidence corrections (2 on saved briefs, 14 in the probe), 3 correct
+            label-based corrections, 56 correct no-ops and <strong>0 wrong corrections</strong>.
+          </p>
         </ResultSection>
       </Container>
     </>
