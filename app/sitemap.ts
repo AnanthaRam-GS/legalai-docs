@@ -10,6 +10,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "/",
     ...mainNav.map((item) => item.href),
+    // Linked from Methodology, Results and Tech stack rather than the main navigation.
+    "/experiments/",
     ...docs.map((doc) => `/docs/${doc.slug}/`),
   ];
   return routes.map((route) => ({
