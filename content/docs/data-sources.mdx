@@ -1,4 +1,4 @@
-LegalAI uses three kinds of data: court judgments for retrieval, official crime statistics for analytics, and a comparative IPC-to-BNS mapping. Each keeps its provenance.
+LegalAI uses four kinds of data: court judgments for retrieval, official crime statistics for analytics, a comparative IPC-to-BNS mapping, and the official section headings of the criminal Acts. Each keeps its provenance.
 
 ## Judgments
 
@@ -40,9 +40,37 @@ Candidates were filtered for criminal law, pre-screened and reviewed by a person
 
 The mapping is a comparative reference, not statutory text. Every row records its source, and NCRB rows also record the printed table page. A full cross-check of the pairs printed in the corrected NCRB table found 68 IPC sections with no CYTRAIN row and no contradiction; those 68 rows were added with their NCRB attribution. NCRB prints which sections a crime head counts, not whether a provision was carried over directly, split or merged, so their change type is shown as "Not specified" rather than guessed. CYTRAIN rows that cover several IPC sections under one group label are not split, because the CYTRAIN site was unreachable when last tried.
 
+## Official section headings
+
+| Item          | Detail                                                                                                                             |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Source**    | India Code, the official legislative repository, at `https://indiacode.gov.in` (the former `indiacode.nic.in` now redirects there) |
+| **Retrieval** | India Code's public DSpace REST API (`/server/api`), over HTTPS, on 12 November 2026; no other site was used                       |
+| **Stored**    | Section numbers and headings only; the Acts' PDFs and section texts are not stored                                                 |
+| **Status**    | <StatusBadge status="pending-approval" label="Unreviewed" /> spot-checked, not reviewed by a lawyer                                |
+
+| Act                                | Read from                                         | Headings                                  |
+| ---------------------------------- | ------------------------------------------------- | ----------------------------------------- |
+| Indian Penal Code, 1860            | The Act's PDF: arrangement and body cross-checked | 548, plus 21 omitted or repealed sections |
+| Indian Evidence Act, 1872          | The same                                          | 181, plus 1 repealed section              |
+| Bharatiya Nyaya Sanhita            | India Code's per-section records                  | 358 (complete)                            |
+| Bharatiya Nagarik Suraksha Sanhita | India Code's per-section records                  | 531 (complete)                            |
+| Bharatiya Sakshya Adhiniyam        | India Code's per-section records                  | 170 (complete)                            |
+| Code of Criminal Procedure, 1973   | —                                                 | **None: a known gap** (below)             |
+
+For the IPC and the Evidence Act, a heading is kept only when the Act's printed arrangement of sections agrees with the section head in the body; the few that could not be corroborated were left out rather than guessed. Every downloaded file's SHA-256 is recorded, published spellings are kept as published, and 70 spot checks (14 per Act) were compared by eye with the rendered official PDF: 70 of 70 matched.
+
+**CrPC is catalog-only.** India Code holds the CrPC only as a scan of the Act as enacted in 1974. Its text layer is noisy OCR, it lacks sections inserted later (such as 41A and 436A), and its headings are margin notes that a second reading cannot confirm. A retry through the Legislative Department's site found no official machine-readable copy either. CrPC sections therefore keep the section catalog's title or stay unverified.
+
+<Callout kind="info" title="India Code attribution">
+  Section headings are from India Code (https://indiacode.gov.in), the official legislative
+  repository of India. Only section numbers and headings are used, inside LegalAI's own analysis.
+</Callout>
+
 ## Derived data
 
 - **Cited sections** for each judgment are extracted by deterministic rules, with the chunk that supports each one.
+- **IPC-BNS mapping flags.** Each mapping row also shows the official headings of its IPC and BNS sections. Nine CYTRAIN rows whose description conflicts with the official heading are flagged; the descriptions are kept as published.
 - **Outcomes** (conviction status, appeal result, disposition) are extracted by conservative rules from the operative part of each judgment. They are unreviewed until a qualified reviewer imports a review file.
 
 ## What is never collected
@@ -50,4 +78,4 @@ The mapping is a comparative reference, not statutory text. Every row records it
 - User uploads are not added to the corpus or any index.
 - No API credentials, secrets or user data are stored in the repository.
 
-Sources: `docs/DATA_SOURCES.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/JUDGMENT_DOCUMENT_PROCESSING.md`, `docs/TRANSITION_VALIDATION_SET.md`, `data/raw/ncrb/SOURCES.md` and `data/raw/ipc_bns/SOURCES.md` in the LegalAI repository.
+Sources: `docs/DATA_SOURCES.md`, `docs/ANALYTICS_DATA.md`, `docs/analytics/NCRB_CORRECTION.md`, `docs/JUDGMENT_DOCUMENT_PROCESSING.md`, `docs/TRANSITION_VALIDATION_SET.md`, `data/raw/ncrb/SOURCES.md`, `data/raw/ipc_bns/SOURCES.md` and `data/structured/statute_headings/SOURCES.md` in the LegalAI repository.
