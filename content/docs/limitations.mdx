@@ -8,7 +8,8 @@ These are the known technical limits of LegalAI as it stands, by area.
 
 ## Answers
 
-- **Grounding is checked structurally.** Citation validation confirms that each claim cites evidence that was actually retrieved, with matching metadata. It does not prove that the cited passage supports the claim in a legal sense.
+- **Grounding is checked structurally at run time.** Citation validation confirms that each claim cites evidence that was actually retrieved, with matching metadata. It does not prove that the cited passage supports the claim: on an AI review of a 15-query sample with full passages, about two-thirds of citations were fully supported and about three-quarters at least partly ([Results](/results/#evaluation-2026-10)).
+- **Transition-law errors.** Answers can misstate how the IPC and the BNS apply across 1 July 2024. Of the 7 citations the review still judged to state the wrong law, 3 were transition reasoning: that murder after 1 July 2024 is still IPC 302, that proof rather than the offence date decides between IPC 302 and BNS 103, and that both can apply to the same act.
 - **Case names in the answer text are not validated.** Only structured citations are checked. In the October 2026 evaluation the full pipeline named 2 real cases in its answer text that were not in its retrieved evidence.
 - **Section titles are checked; section names in prose are not.** Each section the answer lists is shown with a trusted title (official heading, catalog or mapping) or marked "Unverified label", and a wrong statute is corrected only when the label or the uploaded document clearly points to the sister statute. Section names inside sentences, such as the summary, are not resolved; the FIR brief on the [Demo](/demo/) page shows one. The flag that marks a model label differing from the trusted title (often only a synonym) is kept in the data and not shown.
 - **CrPC is catalog-only.** No reliable official machine-readable CrPC exists (India Code holds only a 1974 scan), so CrPC sections have no official headings: 5 of the 105 CrPC sections cited in the corpus have a catalog title and the rest stay unverified. Overall, 214 of the 370 cited sections have a trusted title.
@@ -31,7 +32,7 @@ These are the known technical limits of LegalAI as it stands, by area.
 ## Evaluation
 
 - Retrieval quality was measured on **30 queries** labelled by **one reviewer**, using pooled rather than exhaustive relevance, over the same small corpus. The figures are descriptive, not statistically significant; an expansion by about 70 queries is in progress.
-- The October 2026 answer evaluation covers **30 queries** (24 answered by all three configurations) and its grounding is **structural**; the human review of a 15-query sample is pending.
+- The October 2026 answer evaluation covers **30 queries** (24 answered by all three configurations). Whether citations support their claims was judged on a **15-query sample** by an **AI chat assistant** (not Claude Code), blind to configuration and **not verified by a person**: round 1 on 600-character excerpts, round 2 on full passages for the citations round 1 did not call fully supported, after seeing round 1's verdicts. B and C cannot be told apart on that sample.
 - There has been **no user acceptance testing** yet.
 - **The InLegalBERT party judge is AI-labelled.** The held-out set that decided the adoption of InLegalBERT for Parties & Roles (5 judgment excerpts, 17 parties) was labelled by an AI assistant and not verified by a person, its confidence intervals are wide, and the accused-role fix was not tested on real FIRs or charge sheets. See [Experiments](/experiments/).
 
