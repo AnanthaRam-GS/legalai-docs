@@ -67,8 +67,9 @@ export const shots = {
   },
   analyticsIpcBns: {
     src: "/screenshots/analytics-ipc-bns.webp",
-    alt: "Table mapping IPC provisions to BNS provisions with descriptions and the nature of change",
-    caption: "Analytics, IPC-BNS Map: the comparative mapping (unreviewed).",
+    alt: "IPC-BNS mapping rows for IPC 376, each showing the official heading above the source description; three rows carry the flag Conflicts with the official heading",
+    caption:
+      "Analytics, IPC-BNS Map, searched for IPC 376: each row shows the official India Code heading above the source's own description. Descriptions that conflict with the official heading are flagged and left as published (unreviewed).",
   },
   analyticsNcrb: {
     src: "/screenshots/analytics-ncrb.webp",
@@ -105,15 +106,21 @@ export const shots = {
   },
   professionalBrief: {
     src: "/screenshots/professional-brief.webp",
-    alt: "Brief from an uploaded synthetic FIR PDF with identified sections, parties and roles with page references, applicable law and procedural considerations",
+    alt: "Brief from an uploaded synthetic FIR: identified sections with official titles, two of them marked statute corrected from BNS, CrPC 154 with an unverified label, explicit provisions listing Section 173 BNSS, and parties and roles with page references",
     caption:
-      "A live brief from a synthetic FIR (invented names and places), uploaded privately. Parties and procedural steps come with page references such as [P1, pp. 1-2]. The model's one-line section labels are wrong here: BNS 309(4) is robbery and BNS 115(2) is voluntarily causing hurt, and Section 173 is in the BNSS. This is why answers must be checked against the statute.",
+      "A live brief from a synthetic FIR (invented names and places), captured 13 November 2026 with gpt-oss-120b. Section titles come from India Code: the answer cited BNS 173 and BNS 176, which were corrected to BNSS 173 (Information in cognizable cases) and BNSS 176 (Procedure for investigation); the model's own wording stays in the data only. CrPC 154 has no official heading, so the model's label is shown marked unverified. Parties & Roles come from the combined InLegalBERT and rules NER (on this fixture the rules alone find the same two). Two flaws remain visible: the section cards above the tabs label the corrected BNSS sections “BNS”, a display bug in the card (the list below shows BNSS), and the summary's prose attributes all three sections to the BNSS, because section names inside free text are not checked.",
   },
   professionalBriefDetail: {
     src: "/screenshots/professional-brief-detail.webp",
-    alt: "The same brief's dated chronology, explicit provisions, evidence by category and key legal issues, each item with a page reference",
+    alt: "The same brief's dated chronology and evidence by category, each item with a page reference",
     caption:
-      "The same brief further down: a dated chronology and evidence by category (witness, electronic, medical), each with its page reference. The model also noted that the FIR's dates fall before the BNS took effect on 1 July 2024.",
+      "The same brief further down: a dated chronology and evidence by category (witness, electronic, medical/forensic), each item with its page reference.",
+  },
+  professionalBriefChargesheet: {
+    src: "/screenshots/professional-brief-chargesheet.webp",
+    alt: "Brief from an uploaded synthetic charge sheet: IPC 420, 406 and 120B with official headings, CrPC 438 with a catalog title, CrPC 161 and 173(2) with unverified labels, and parties and roles listing two accused and the complainant",
+    caption:
+      "A live brief from a synthetic charge sheet, captured 13 November 2026. IPC 420, 406 and 120B show their official India Code headings and CrPC 438 its catalog title; CrPC 161 and 173(2) have no trusted title, so the model's wording is shown marked unverified (the CrPC gap). Parties & Roles list both accused and the complainant with page references, with no cut-off duplicate name such as E4's “Dev Fake”.",
   },
   ocr: {
     alt: "Answer for a scanned FIR showing the low-confidence OCR note",

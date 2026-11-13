@@ -24,6 +24,7 @@ const gallery = [
   shots.professionalPrecedents,
   shots.professionalBrief,
   shots.professionalBriefDetail,
+  shots.professionalBriefChargesheet,
   shots.analyticsTrends,
   shots.analyticsOutcomes,
   shots.analyticsCooccurrence,
